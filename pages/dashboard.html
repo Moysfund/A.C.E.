@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Dashboard - A.C.E.</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        /* Additional dashboard styles */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: 0.3s ease;
+        }
+
+        .stat-card:hover {
+            background: rgba(0, 212, 255, 0.05);
+            border-color: rgba(0, 212, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .stat-card .number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #00d4ff;
+            display: block;
+        }
+
+        .stat-card .label {
+            font-size: 0.8rem;
+            color: #889bc2;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0.3rem;
+        }
+
+        .stat-card .change {
+            font-size: 0.7rem;
+            margin-top: 0.5rem;
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+        }
+
+        .change.up {
+            background: rgba(76, 175, 80, 0.15);
+            color: #4caf50;
+        }
+
+        .change.down {
+            background: rgba(255, 107, 107, 0.15);
+            color: #ff6b6b;
+        }
+
+        .chart-placeholder {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            color: #5a6f92;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .chart-placeholder i {
+            font-size: 3rem;
+            color: #00d4ff;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .recent-list {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .recent-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .recent-item:last-child {
+            border-bottom: none;
+        }
+
+        .recent-item .info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .recent-item .badge-status {
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .badge-status.approved {
+            background: rgba(76, 175, 80, 0.15);
+            color: #4caf50;
+        }
+
+        .badge-status.pending {
+            background: rgba(255, 193, 7, 0.15);
+            color: #ffc107;
+        }
+
+        .badge-status.rejected {
+            background: rgba(255, 107, 107, 0.15);
+            color: #ff6b6b;
+        }
+
+        .badge-status.contravention {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+        }
+
+        .recent-item .time {
+            font-size: 0.75rem;
+            color: #5a6f92;
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 700px) {
+            .two-col {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .quick-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .quick-actions button {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 1rem;
+            border-radius: 12px;
+            color: #eef2f8;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+        }
+
+        .quick-actions button:hover {
+            background: rgba(0, 212, 255, 0.05);
+            border-color: rgba(0, 212, 255, 0.2);
+        }
+
+        .quick-actions button i {
+            color: #00d4ff;
+            width: 24px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation -->
+    <div class="top-bar" style="position:fixed;top:0;left:0;right:0;z-index:50;">
+        <div class="logo">
+            <span style="font-size:1.6rem;">⚡</span>
+            A.C.E.
+            <small>Automated Compliance Engine</small>
+        </div>
+        <div class="top-actions">
+            <span class="badge"><i class="fas fa-circle" style="color:#4caf50;font-size:0.5rem;"></i> EPPPS live</span>
+            <div class="user">
+                <i class="fas fa-user-cog"></i>
+                <span style="font-size:0.8rem;font-weight:500;">Team A</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div style="padding:90px 20px 30px;max-width:1200px;margin:0 auto;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;">
+            <h1 style="font-size:2rem;font-weight:800;">📊 Dashboard</h1>
+            <div style="display:flex;gap:0.8rem;flex-wrap:wrap;">
+                <button onclick="window.location.href='../index.html'" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);padding:0.6rem 1.2rem;border-radius:40px;color:#eef2f8;cursor:pointer;font-family:'Inter',sans-serif;">
+                    <i class="fas fa-arrow-left"></i> Home
+                </button>
+                <button onclick="window.location.href='stage-report.html'" style="background:linear-gradient(135deg,#00d4ff,#0088cc);border:none;padding:0.6rem 1.5rem;border-radius:40px;color:#0b0f1a;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">
+                    <i class="fas fa-plus"></i> New Report
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="dashboard-grid">
+            <div class="stat-card">
+                <span class="number">2,341</span>
+                <div class="label">Stage Reports</div>
+                <span class="change up"><i class="fas fa-arrow-up"></i> 12% this month</span>
+            </div>
+            <div class="stat-card">
+                <span class="number">187</span>
+                <div class="label">Active Contraventions</div>
+                <span class="change down"><i class="fas fa-arrow-up"></i> 8% this month</span>
+            </div>
+            <div class="stat-card">
+                <span class="number">96</span>
+                <div class="label">Active Projects</div>
+                <span class="change up"><i class="fas fa-arrow-up"></i> 5 new this week</span>
+            </div>
+            <div class="stat-card">
+                <span class="number">89%</span>
+                <div class="label">AI Accuracy Rate</div>
+                <span class="change up"><i class="fas fa-check-circle"></i> Improving</span>
+            </div>
+        </div>
+
+        <!-- Two Column Layout -->
+        <div class="two-col">
+            <!-- Left Column -->
+            <div>
+                <h3 style="margin-bottom:1rem;font-size:1.2rem;">📋 Recent Reports</h3>
+                <div class="recent-list">
+                    <div class="recent-item">
+                        <div class="info">
+                            <span style="font-weight:600;">Eko Tower Phase 2</span>
+                            <span class="badge-status approved">Approved</span>
+                        </div>
+                        <span class="time">2 hours ago</span>
+                    </div>
+                    <div class="recent-item">
+                        <div class="info">
+                            <span style="font-weight:600;">12 Allen Avenue</span>
+                            <span class="badge-status contravention">Contravention</span>
+                        </div>
+                        <span class="time">5 hours ago</span>
+                    </div>
+                    <div class="recent-item">
+                        <div class="info">
+                            <span style="font-weight:600;">Victoria Island Plaza</span>
+                            <span class="badge-status pending">Pending</span>
+                        </div>
+                        <span class="time">1 day ago</span>
+                    </div>
+                    <div class="recent-item">
+                        <div class="info">
+                            <span style="font-weight:600;">Surulere Estate</span>
+                            <span class="badge-status approved">Approved</span>
+                        </div>
+                        <span class="time">2 days ago</span>
+                    </div>
+                    <div class="recent-item">
+                        <div class="info">
+                            <span style="font-weight:600;">Lekki Phase 1</span>
+                            <span class="badge-status rejected">Rejected</span>
+                        </div>
+                        <span class="time">3 days ago</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div>
+                <h3 style="margin-bottom:1rem;font-size:1.2rem;">⚡ Quick Actions</h3>
+                <div class="quick-actions">
+                    <button onclick="window.location.href='stage-report.html'">
+                        <i class="fas fa-camera"></i> New Stage Report
+                    </button>
+                    <button onclick="window.location.href='contravention.html'">
+                        <i class="fas fa-exclamation-triangle"></i> Report Contravention
+                    </button>
+                    <button onclick="window.location.href='pca-audit.html'">
+                        <i class="fas fa-clipboard-check"></i> PCA Audit
+                    </button>
+                    <button onclick="showToast('🔄 Syncing with Google Sheets...')">
+                        <i class="fas fa-sync-alt"></i> Sync with Google Sheets
+                    </button>
+                    <button onclick="showToast('📊 Exporting reports...')">
+                        <i class="fas fa-download"></i> Export Weekly Report
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Section -->
+        <div style="margin-top:2rem;">
+            <h3 style="margin-bottom:1rem;font-size:1.2rem;">📈 Analytics Overview</h3>
+            <div class="chart-placeholder">
+                <i class="fas fa-chart-bar"></i>
+                <p>Chart: Stage Reports vs Contraventions (Last 6 Months)</p>
+                <p style="font-size:0.8rem;color:#5a6f92;">[Interactive chart coming with full version]</p>
+                <!-- Simple visual bars -->
+                <div style="display:flex;gap:1rem;width:100%;max-width:500px;margin-top:1rem;align-items:flex-end;height:120px;">
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
+                        <div style="width:100%;background:rgba(0,212,255,0.2);height:80px;border-radius:8px 8px 0 0;position:relative;">
+                            <div style="position:absolute;bottom:0;left:0;right:0;background:#00d4ff;height:65px;border-radius:8px 8px 0 0;"></div>
+                        </div>
+                        <span style="font-size:0.7rem;color:#5a6f92;margin-top:0.3rem;">Jan</span>
+                    </div>
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
+                        <div style="width:100%;background:rgba(0,212,255,0.2);height:80px;border-radius:8px 8px 0 0;position:relative;">
+                            <div style="position:absolute;bottom:0;left:0;right:0;background:#00d4ff;height:45px;border-radius:8px 8px 0 0;"></div>
+                        </div>
+                        <span style="font-size:0.7rem;color:#5a6f92;margin-top:0.3rem;">Feb</span>
+                    </div>
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
+                        <div style="width:100%;background:rgba(0,212,255,0.2);height:80px;border-radius:8px 8px 0 0;position:relative;">
+                            <div style="position:absolute;bottom:0;left:0;right:0;background:#00d4ff;height:70px;border-radius:8px 8px 0 0;"></div>
+                        </div>
+                        <span style="font-size:0.7rem;color:#5a6f92;margin-top:0.3rem;">Mar</span>
+                    </div>
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
+                        <div style="width:100%;background:rgba(255,107,107,0.2);height:80px;border-radius:8px 8px 0 0;position:relative;">
+                            <div style="position:absolute;bottom:0;left:0;right:0;background:#ff6b6b;height:50px;border-radius:8px 8px 0 0;"></div>
+                        </div>
+                        <span style="font-size:0.7rem;color:#5a6f92;margin-top:0.3rem;">Apr</span>
+                    </div>
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
+                        <div style="width:100%;background:rgba(255,107,107,0.2);height:80px;border-radius:8px 8px 0 0;position:relative;">
+                            <div style="position:absolute;bottom:0;left:0;right:0;background:#ff6b6b;height:35px;border-radius:8px 8px 0 0;"></div>
+                        </div>
+                        <span style="font-size:0.7rem;color:#5a6f92;margin-top:0.3rem;">May</span>
+                    </div>
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
+                        <div style="width:100%;background:rgba(0,212,255,0.2);height:80px;border-radius:8px 8px 0 0;position:relative;">
+                            <div style="position:absolute;bottom:0;left:0;right:0;background:#00d4ff;height:55px;border-radius:8px 8px 0 0;"></div>
+                        </div>
+                        <span style="font-size:0.7rem;color:#5a6f92;margin-top:0.3rem;">Jun</span>
+                    </div>
+                </div>
+                <div style="display:flex;gap:1.5rem;margin-top:0.8rem;font-size:0.7rem;">
+                    <span><span style="display:inline-block;width:12px;height:12px;background:#00d4ff;border-radius:3px;vertical-align:middle;margin-right:4px;"></span> Stage Reports</span>
+                    <span><span style="display:inline-block;width:12px;height:12px;background:#ff6b6b;border-radius:3px;vertical-align:middle;margin-right:4px;"></span> Contraventions</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Performance -->
+        <div style="margin-top:2rem;">
+            <h3 style="margin-bottom:1rem;font-size:1.2rem;">👥 Team Performance</h3>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;">
+                <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:1rem;text-align:center;">
+                    <div style="font-weight:700;color:#00d4ff;">Team A</div>
+                    <div style="font-size:0.8rem;color:#889bc2;">342 reports</div>
+                    <div style="font-size:0.7rem;color:#4caf50;">▲ 98% accuracy</div>
+                </div>
+                <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:1rem;text-align:center;">
+                    <div style="font-weight:700;color:#00d4ff;">Team B</div>
+                    <div style="font-size:0.8rem;color:#889bc2;">287 reports</div>
+                    <div style="font-size:0.7rem;color:#4caf50;">▲ 95% accuracy</div>
+                </div>
+                <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:1rem;text-align:center;">
+                    <div style="font-weight:700;color:#00d4ff;">Team C</div>
+                    <div style="font-size:0.8rem;color:#889bc2;">198 reports</div>
+                    <div style="font-size:0.7rem;color:#ffc107;">▲ 91% accuracy</div>
+                </div>
+                <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:1rem;text-align:center;">
+                    <div style="font-weight:700;color:#00d4ff;">Special Team</div>
+                    <div style="font-size:0.8rem;color:#889bc2;">156 reports</div>
+                    <div style="font-size:0.7rem;color:#4caf50;">▲ 97% accuracy</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // Toast function
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Make showToast global
+        window.showToast = showToast;
+    </script>
+</body>
+</html>
