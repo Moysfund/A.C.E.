@@ -47,13 +47,13 @@ body {
 
 .splash-card {
     background: linear-gradient(145deg, #141d2b, #1b2838);
-    border: 1px solid rgba(255, 215, 0, 0.25);
+    border: 1px solid rgba(0, 212, 255, 0.25);
     border-radius: 48px;
     padding: 3rem 4rem;
     max-width: 620px;
     width: 90%;
     text-align: center;
-    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 200, 50, 0.1);
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(0, 212, 255, 0.1);
     animation: splashPulse 2.5s ease-in-out infinite;
     position: relative;
     overflow: hidden;
@@ -63,11 +63,11 @@ body {
     content: '';
     position: absolute;
     inset: -2px;
-    background: conic-gradient(from 0deg, #f5b042, #d4a030, #f5b042, #d4a030, #f5b042);
+    background: conic-gradient(from 0deg, #00d4ff, #0088cc, #00d4ff, #0088cc, #00d4ff);
     border-radius: 48px;
     z-index: -1;
     animation: rotateBorder 8s linear infinite;
-    opacity: 0.4;
+    opacity: 0.3;
 }
 
 @keyframes rotateBorder {
@@ -88,34 +88,28 @@ body {
 
 .splash-icon {
     font-size: 4.2rem;
-    color: #f5b042;
+    color: #00d4ff;
     margin-bottom: 0.5rem;
-    filter: drop-shadow(0 0 20px rgba(245, 176, 66, 0.3));
+    filter: drop-shadow(0 0 30px rgba(0, 212, 255, 0.3));
 }
 
 .splash-card h1 {
-    font-size: 2.8rem;
+    font-size: 3.2rem;
     font-weight: 900;
-    letter-spacing: -1px;
-    background: linear-gradient(to right, #f5b042, #ffd966, #f5b042);
+    letter-spacing: 4px;
+    background: linear-gradient(to right, #00d4ff, #66e0ff, #00d4ff);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    margin-bottom: 0.25rem;
-}
-
-.splash-card h1 span {
-    font-weight: 300;
-    color: #aab;
-    -webkit-text-fill-color: #aab;
+    margin-bottom: 0.1rem;
 }
 
 .splash-card .sub {
     font-weight: 600;
-    font-size: 1.1rem;
+    font-size: 0.9rem;
     letter-spacing: 3px;
     color: #b9c8e6;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
     text-transform: uppercase;
 }
 
@@ -134,7 +128,7 @@ body {
 .splash-stats .num {
     font-size: 2rem;
     font-weight: 800;
-    color: #f5b042;
+    color: #00d4ff;
     display: block;
 }
 
@@ -153,7 +147,7 @@ body {
 }
 
 .splash-btn {
-    background: linear-gradient(135deg, #f5b042, #d48d2a);
+    background: linear-gradient(135deg, #00d4ff, #0088cc);
     border: none;
     padding: 1rem 2.8rem;
     border-radius: 60px;
@@ -162,14 +156,14 @@ body {
     color: #0b0f1a;
     cursor: pointer;
     transition: 0.25s ease;
-    box-shadow: 0 8px 24px rgba(245, 176, 66, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 212, 255, 0.3);
     margin-top: 0.5rem;
     letter-spacing: 0.5px;
 }
 
 .splash-btn:hover {
     transform: scale(1.04);
-    box-shadow: 0 12px 32px rgba(245, 176, 66, 0.5);
+    box-shadow: 0 12px 32px rgba(0, 212, 255, 0.5);
 }
 
 .splash-btn i {
@@ -199,7 +193,7 @@ body {
     padding: 1.2rem 2.5rem;
     background: rgba(11, 15, 26, 0.55);
     backdrop-filter: blur(8px);
-    border-bottom: 1px solid rgba(255, 215, 0, 0.08);
+    border-bottom: 1px solid rgba(0, 212, 255, 0.08);
     pointer-events: auto;
 }
 
@@ -208,18 +202,17 @@ body {
     align-items: center;
     gap: 12px;
     font-weight: 800;
-    font-size: 1.4rem;
+    font-size: 1.6rem;
     color: #f5f8ff;
 }
 
-.logo i {
-    color: #f5b042;
-    font-size: 1.8rem;
+.logo span {
+    color: #00d4ff;
 }
 
 .logo small {
     font-weight: 400;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     color: #a0b3d9;
     letter-spacing: 1px;
     margin-left: 6px;
@@ -232,13 +225,13 @@ body {
 }
 
 .top-actions .badge {
-    background: rgba(245, 176, 66, 0.15);
-    border: 1px solid rgba(245, 176, 66, 0.3);
+    background: rgba(0, 212, 255, 0.12);
+    border: 1px solid rgba(0, 212, 255, 0.25);
     padding: 0.4rem 1.2rem;
     border-radius: 40px;
     font-size: 0.8rem;
     font-weight: 600;
-    color: #f5b042;
+    color: #00d4ff;
     letter-spacing: 0.3px;
 }
 
@@ -268,7 +261,7 @@ body {
     right: 2rem;
     background: rgba(12, 20, 34, 0.75);
     backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 215, 0, 0.15);
+    border: 1px solid rgba(0, 212, 255, 0.15);
     border-radius: 24px;
     padding: 1.2rem 1.8rem;
     pointer-events: auto;
@@ -290,7 +283,7 @@ body {
 
 .live-stats .stat-item .val {
     font-weight: 700;
-    color: #f5b042;
+    color: #00d4ff;
 }
 
 .live-stats .stat-title {
@@ -330,13 +323,13 @@ body {
 }
 
 .cta-panel button:hover {
-    background: rgba(245, 176, 66, 0.15);
-    border-color: #f5b042;
+    background: rgba(0, 212, 255, 0.12);
+    border-color: #00d4ff;
     transform: translateX(4px);
 }
 
 .cta-panel button i {
-    color: #f5b042;
+    color: #00d4ff;
 }
 
 /* ========== MOBILE RESPONSIVE ========== */
@@ -345,7 +338,7 @@ body {
         padding: 2rem 1.5rem;
     }
     .splash-card h1 {
-        font-size: 2rem;
+        font-size: 2.4rem;
     }
     .splash-stats {
         gap: 1rem;
@@ -356,7 +349,10 @@ body {
         gap: 0.5rem;
     }
     .logo {
-        font-size: 1.1rem;
+        font-size: 1.2rem;
+    }
+    .logo small {
+        font-size: 0.5rem;
     }
     .top-actions .badge {
         display: none;
@@ -377,7 +373,7 @@ body {
     }
 }
 
-/* ========== PAGE TRANSITIONS ========== */
+/* ========== PAGE CONTAINER ========== */
 .page-container {
     position: fixed;
     top: 0;
@@ -423,6 +419,11 @@ body {
     font-weight: 800;
 }
 
+.page-container .page-header h2 i {
+    color: #00d4ff;
+    margin-right: 10px;
+}
+
 .page-container .page-header .close-btn {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -458,6 +459,11 @@ body {
     color: #b9c8e6;
 }
 
+.form-group label .required {
+    color: #ff6b6b;
+    margin-left: 4px;
+}
+
 .form-group input,
 .form-group select,
 .form-group textarea {
@@ -476,8 +482,8 @@ body {
 .form-group select:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: #f5b042;
-    background: rgba(245, 176, 66, 0.05);
+    border-color: #00d4ff;
+    background: rgba(0, 212, 255, 0.05);
 }
 
 .form-group textarea {
@@ -496,8 +502,8 @@ body {
 }
 
 .form-group .file-upload:hover {
-    border-color: #f5b042;
-    background: rgba(245, 176, 66, 0.03);
+    border-color: #00d4ff;
+    background: rgba(0, 212, 255, 0.03);
 }
 
 .form-group .file-upload i {
@@ -506,8 +512,20 @@ body {
     margin-bottom: 0.5rem;
 }
 
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+@media (max-width: 600px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
 .submit-btn {
-    background: linear-gradient(135deg, #f5b042, #d48d2a);
+    background: linear-gradient(135deg, #00d4ff, #0088cc);
     border: none;
     padding: 1rem 2.8rem;
     border-radius: 60px;
@@ -516,14 +534,14 @@ body {
     color: #0b0f1a;
     cursor: pointer;
     transition: 0.25s ease;
-    box-shadow: 0 8px 24px rgba(245, 176, 66, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 212, 255, 0.3);
     font-family: 'Inter', sans-serif;
     width: 100%;
 }
 
 .submit-btn:hover {
     transform: scale(1.02);
-    box-shadow: 0 12px 32px rgba(245, 176, 66, 0.5);
+    box-shadow: 0 12px 32px rgba(0, 212, 255, 0.5);
 }
 
 .submit-btn:disabled {
@@ -534,15 +552,15 @@ body {
 
 /* ========== AI RESPONSE CARD ========== */
 .ai-response {
-    background: rgba(245, 176, 66, 0.05);
-    border: 1px solid rgba(245, 176, 66, 0.2);
+    background: rgba(0, 212, 255, 0.05);
+    border: 1px solid rgba(0, 212, 255, 0.2);
     border-radius: 16px;
     padding: 1.5rem;
     margin: 1.5rem 0;
 }
 
 .ai-response h4 {
-    color: #f5b042;
+    color: #00d4ff;
     margin-bottom: 0.5rem;
 }
 
@@ -564,7 +582,7 @@ body {
     transform: translateX(-50%);
     background: rgba(11, 15, 26, 0.9);
     backdrop-filter: blur(12px);
-    border: 1px solid rgba(245, 176, 66, 0.2);
+    border: 1px solid rgba(0, 212, 255, 0.2);
     padding: 0.8rem 2rem;
     border-radius: 40px;
     color: #eef2f8;
@@ -590,3 +608,32 @@ body {
         transform: translateX(-50%) translateY(0);
     }
 }
+
+/* ========== TOGGLE SWITCH ========== */
+.toggle-group {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.toggle-group button {
+    padding: 0.5rem 1.2rem;
+    border-radius: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: transparent;
+    color: #889bc2;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-family: 'Inter', sans-serif;
+    transition: 0.2s;
+}
+
+.toggle-group button.active {
+    background: rgba(0, 212, 255, 0.15);
+    border-color: #00d4ff;
+    color: #00d4ff;
+}
+
+.toggle-group button:hover {
+    border-color: #00d4ff;
+    }
