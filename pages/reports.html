@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Reports - A.C.E.</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        .report-filters {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+        .report-filters input,
+        .report-filters select {
+            padding: 0.6rem 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 40px;
+            color: #eef2f8;
+            font-family: 'Inter', sans-serif;
+            flex: 1;
+            min-width: 150px;
+        }
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        .report-table th {
+            text-align: left;
+            padding: 0.8rem 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: #5a6f92;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 0.5px;
+        }
+        .report-table td {
+            padding: 0.8rem 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        .report-table tr:hover td {
+            background: rgba(0, 212, 255, 0.02);
+        }
+        .report-table .status-badge {
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+        .status-badge.approved {
+            background: rgba(76, 175, 80, 0.15);
+            color: #4caf50;
+        }
+        .status-badge.pending {
+            background: rgba(255, 193, 7, 0.15);
+            color: #ffc107;
+        }
+        .status-badge.rejected {
+            background: rgba(255, 107, 107, 0.15);
+            color: #ff6b6b;
+        }
+        .status-badge.contravention {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+        }
+        .report-table .actions button {
+            background: none;
+            border: none;
+            color: #5a6f92;
+            cursor: pointer;
+            padding: 0.2rem 0.5rem;
+            transition: 0.2s;
+        }
+        .report-table .actions button:hover {
+            color: #00d4ff;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+        .pagination button {
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: transparent;
+            color: #889bc2;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+        .pagination button.active {
+            background: rgba(0, 212, 255, 0.15);
+            border-color: #00d4ff;
+            color: #00d4ff;
+        }
+        .pagination button:hover {
+            border-color: rgba(0, 212, 255, 0.3);
+        }
+        .export-bar {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: flex-end;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .export-bar button {
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.02);
+            color: #eef2f8;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            transition: 0.2s;
+        }
+        .export-bar button:hover {
+            background: rgba(0, 212, 255, 0.05);
+            border-color: rgba(0, 212, 255, 0.2);
+        }
+        .export-bar button i {
+            color: #00d4ff;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation -->
+    <div class="top-bar" style="position:fixed;top:0;left:0;right:0;z-index:50;">
+        <div class="logo">
+            <span style="font-size:1.6rem;">⚡</span>
+            A.C.E.
+            <small>Reports</small>
+        </div>
+        <div class="top-actions">
+            <span class="badge"><i class="fas fa-circle" style="color:#4caf50;font-size:0.5rem;"></i> EPPPS live</span>
+            <div class="user">
+                <i class="fas fa-user-cog"></i>
+                <span style="font-size:0.8rem;font-weight:500;">Team A</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div style="padding:90px 20px 30px;max-width:1200px;margin:0 auto;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+            <h1 style="font-size:1.8rem;font-weight:800;"><i class="fas fa-file-alt" style="color:#00d4ff;"></i> Reports</h1>
+            <button onclick="window.location.href='dashboard.html'" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);padding:0.6rem 1.2rem;border-radius:40px;color:#eef2f8;cursor:pointer;font-family:'Inter',sans-serif;">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+        </div>
+
+        <!-- Summary Stats -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1rem;margin-bottom:1.5rem;">
+            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:0.8rem;text-align:center;">
+                <div style="font-size:0.7rem;color:#5a6f92;">Total</div>
+                <div style="font-size:1.5rem;font-weight:800;color:#00d4ff;">2,341</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:0.8rem;text-align:center;">
+                <div style="font-size:0.7rem;color:#5a6f92;">Approved</div>
+                <div style="font-size:1.5rem;font-weight:800;color:#4caf50;">1,892</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:0.8rem;text-align:center;">
+                <div style="font-size:0.7rem;color:#5a6f92;">Pending</div>
+                <div style="font-size:1.5rem;font-weight:800;color:#ffc107;">262</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:0.8rem;text-align:center;">
+                <div style="font-size:0.7rem;color:#5a6f92;">Contraventions</div>
+                <div style="font-size:1.5rem;font-weight:800;color:#ff6b6b;">187</div>
+            </div>
+        </div>
+
+        <!-- Filters & Export -->
+        <div style="display:flex;flex-wrap:wrap;gap:1rem;justify-content:space-between;margin-bottom:1rem;">
+            <div class="report-filters" style="flex:1;min-width:300px;">
+                <input type="text" id="searchReports" placeholder="🔍 Search reports..." />
+                <select id="filterType">
+                    <option value="all">All Types</option>
+                    <option value="stage">Stage Reports</option>
+                    <option value="contravention">Contraventions</option>
+                    <option value="pca">PCA Audits</option>
+                </select>
+                <select id="filterStatus">
+                    <option value="all">All Status</option>
+                    <option value="approved">Approved</option>
+                    <option value="pending">Pending</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+            </div>
+            <div class="export-bar">
+                <button onclick="showToast('📊 Exporting as CSV...')"><i class="fas fa-file-csv"></i> CSV</button>
+                <button onclick="showToast('📄 Exporting as PDF...')"><i class="fas fa-file-pdf"></i> PDF</button>
+                <button onclick="showToast('📋 Copying to clipboard...')"><i class="fas fa-copy"></i> Copy</button>
+            </div>
+        </div>
+
+        <!-- Reports Table -->
+        <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:0 1rem;overflow-x:auto;">
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Project</th>
+                        <th>Type</th>
+                        <th>Stage</th>
+                        <th>Team</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="reportTableBody">
+                    <!-- Rows rendered by JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination">
+            <button onclick="changePage('prev')"><i class="fas fa-chevron-left"></i></button>
+            <button class="active">1</button>
+            <button onclick="showToast('📄 Page 2')">2</button>
+            <button onclick="showToast('📄 Page 3')">3</button>
+            <button onclick="changePage('next')"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // Sample report data
+        const reports = [
+            { id: '#SR-2026-001', project: 'Eko Tower Phase 2', type: 'Stage', stage: '2nd Floor', team: 'Team A', status: 'approved', date: '2026-06-18' },
+            { id: '#CV-2026-012', project: '12 Allen Avenue', type: 'Contravention', stage: 'Ground Floor', team: 'Team B', status: 'contravention', date: '2026-06-17' },
+            { id: '#SR-2026-002', project: 'Victoria Island Plaza', type: 'Stage', stage: '1st Floor', team: 'Team C', status: 'pending', date: '2026-06-16' },
+            { id: '#PCA-2026-003', project: 'Surulere Estate', type: 'PCA', stage: 'Final', team: 'Team A', status: 'approved', date: '2026-06-15' },
+            { id: '#SR-2026-004', project: 'Lekki Phase 1', type: 'Stage', stage: 'Roof', team: 'Special Team', status: 'rejected', date: '2026-06-14' },
+            { id: '#CV-2026-013', project: 'Ikeja Mall', type: 'Contravention', stage: '1st Floor', team: 'Team B', status: 'contravention', date: '2026-06-13' },
+            { id: '#SR-2026-005', project: 'Magodo Estate', type: 'Stage', stage: 'Ground Floor', team: 'Team A', status: 'approved', date: '2026-06-12' },
+            { id: '#PCA-2026-004', project: 'VI Tower', type: 'PCA', stage: 'Final', team: 'Team C', status: 'pending', date: '2026-06-11' },
+            { id: '#SR-2026-006', project: 'Ajah Residences', type: 'Stage', stage: '3rd Floor', team: 'Special Team', status: 'approved', date: '2026-06-10' },
+            { id: '#CV-2026-014', project: 'Yaba Tech Hub', type: 'Contravention', stage: '2nd Floor', team: 'Team A', status: 'contravention', date: '2026-06-09' },
+        ];
+
+        // Render reports table
+        function renderReports() {
+            const tbody = document.getElementById('reportTableBody');
+            tbody.innerHTML = reports.map(r => `
+                <tr>
+                    <td style="font-weight:600;font-size:0.75rem;color:#5a6f92;">${r.id}</td>
+                    <td style="font-weight:600;">${r.project}</td>
+                    <td><span style="color:#00d4ff;">${r.type}</span></td>
+                    <td>${r.stage}</td>
+                    <td>${r.team}</td>
+                    <td><span class="status-badge ${r.status}">${r.status}</span></td>
+                    <td style="font-size:0.8rem;color:#5a6f92;">${r.date}</td>
+                    <td class="actions">
+                        <button onclick="showToast('👁️ Viewing ${r.id}')"><i class="fas fa-eye"></i></button>
+                        <button onclick="showToast('📥 Downloading ${r.id}')"><i class="fas fa-download"></i></button>
+                        <button onclick="showToast('📧 Sharing ${r.id}')"><i class="fas fa-share-alt"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Search and filter
+        document.getElementById('searchReports').addEventListener('input', function() {
+            const search = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#reportTableBody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(search) ? '' : 'none';
+            });
+        });
+
+        function changePage(dir) {
+            showToast(dir === 'prev' ? '⬅️ Previous page' : '➡️ Next page');
+        }
+
+        // Toast function
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Initial render
+        renderReports();
+    </script>
+</body>
+</html>
