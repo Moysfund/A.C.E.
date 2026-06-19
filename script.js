@@ -176,4 +176,355 @@ buildingGroup.add(craneGroup);
 // labels
 const labelGroup = new THREE.Group();
 const stageLabels = ['Ground Floor', '1st Floor', '2nd Floor', '3rd Floor', 'Roof'];
-const yOffsets = [0.6, 1.6,
+const yOffsets = [0.6, 1.6, 2.6, 3.6, 4.6];
+stageLabels.forEach((text, i) => {
+    const div = document.createElement('div');
+    div.textContent = text;
+    div.style.color = '#b9c8e6';
+    div.style.fontSize = '10px';
+    div.style.fontWeight = '600';
+    div.style.fontFamily = 'Inter, sans-serif';
+    div.style.background = 'rgba(11, 15, 26, 0.6)';
+    div.style.padding = '2px 12px';
+    div.style.borderRadius = '20px';
+    div.style.border = '1px solid rgba(0, 212, 255, 0.2)';
+    div.style.backdropFilter = 'blur(4px)';
+    div.style.letterSpacing = '0.5px';
+    div.style.textShadow = '0 2px 8px rgba(0,0,0,0.8)';
+    const label = new CSS2DObject(div);
+    label.position.set(-5.8, yOffsets[i], 0.5);
+    labelGroup.add(label);
+});
+buildingGroup.add(labelGroup);
+
+// A.C.E. AI badge
+const aiDiv = document.createElement('div');
+aiDiv.textContent = '⚡ A.C.E. AI analyzing ...';
+aiDiv.style.color = '#00d4ff';
+aiDiv.style.fontSize = '11px';
+aiDiv.style.fontWeight = '700';
+aiDiv.style.background = 'rgba(11, 15, 26, 0.7)';
+aiDiv.style.padding = '4px 16px';
+aiDiv.style.borderRadius = '30px';
+aiDiv.style.border = '1px solid #00d4ff';
+aiDiv.style.backdropFilter = 'blur(4px)';
+const aiLabel = new CSS2DObject(aiDiv);
+aiLabel.position.set(0, 5.0, 4.2);
+buildingGroup.add(aiLabel);
+
+// warning label
+const warnDiv = document.createElement('div');
+warnDiv.textContent = '⚠️ Contravention: Column 2';
+warnDiv.style.color = '#ff6b6b';
+warnDiv.style.fontSize = '10px';
+warnDiv.style.fontWeight = '700';
+warnDiv.style.background = 'rgba(180, 30, 30, 0.25)';
+warnDiv.style.padding = '2px 14px';
+warnDiv.style.borderRadius = '30px';
+warnDiv.style.border = '1px solid #ff6b6b';
+warnDiv.style.backdropFilter = 'blur(4px)';
+const warnLabel = new CSS2DObject(warnDiv);
+warnLabel.position.set(-2.5, 2.8, 4.0);
+buildingGroup.add(warnLabel);
+
+scene.add(buildingGroup);
+
+// particles
+const particleCount = 400;
+const particleGeo = new THREE.BufferGeometry();
+const particlePos = new Float32Array(particleCount * 3);
+for (let i = 0; i < particleCount * 3; i++) {
+    particlePos[i] = (Math.random() - 0.5) * 60;
+    if (i % 3 === 1) particlePos[i] = Math.random() * 12;
+}
+particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePos, 3));
+const particleMat = new THREE.PointsMaterial({
+    color: 0x00d4ff,
+    size: 0.06,
+    transparent: true,
+    opacity: 0.25,
+    blending: THREE.AdditiveBlending
+});
+const particles = new THREE.Points(particleGeo, particleMat);
+scene.add(particles);
+
+// ===== SPLASH LOGIC =====
+document.getElementById('enterBtn').addEventListener('click', () => {
+    document.getElementById('splash-overlay').classList.add('hidden');
+    controls.autoRotate = true;
+});
+
+// ===== RESIZE =====
+window.addEventListener('resize', () => {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+    labelRenderer.setSize(w, h);
+});
+
+// ===== ANIMATION =====
+function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+
+    const hookObj = craneGroup.children.find(c => c.geometry && c.geometry.type === 'SphereGeometry');
+    if (hookObj) {
+        hookObj.position.y = 5.8 + Math.sin(Date.now() * 0.0015) * 0.15;
+    }
+    particles.rotation.y += 0.0002;
+
+    renderer.render(scene, camera);
+    labelRenderer.render(scene, camera);
+}
+animate();
+
+setTimeout(() => {
+    controls.autoRotate = true;
+}, 500);
+
+// ===== GLOBAL FUNCTIONS (for inline onclick) =====
+window.navigateTo = function(page) {
+    // For now, just show a toast
+    showToast('📄 Opening ' + page.replace('-', ' ') + '... (coming soon)');
+};
+
+window.syncGoogleSheet = function() {
+    showToast('🔄 Syncing with Google Sheets... (simulated)');
+};
+
+window.showToast = function(message) {
+    let toast = document.getElementById('toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'toast';
+        toast.className = 'toast';
+        document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.classList.add('show');
+    clearTimeout(toast._timeout);
+    toast._timeout = setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+};
+
+// ===== ADD PAGES DYNAMICALLY =====
+// We'll inject page content on demand
+const pageTemplates = {
+    'stage-report': `
+        <h2><i class="fas fa-camera"></i> New Stage Report</h2>
+        <form id="stageReportForm">
+            <div class="form-group">
+                <label>Project Name <span class="required">*</span></label>
+                <input type="text" placeholder="e.g., Eko Tower Phase 2" required />
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Stage <span class="required">*</span></label>
+                    <select required>
+                        <option value="">Select stage</option>
+                        <option>Ground Floor</option>
+                        <option>1st Floor</option>
+                        <option>2nd Floor</option>
+                        <option>3rd Floor</option>
+                        <option>Roof</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Team <span class="required">*</span></label>
+                    <select required>
+                        <option value="">Select team</option>
+                        <option>Team A</option>
+                        <option>Team B</option>
+                        <option>Team C</option>
+                        <option>Special Team</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Upload Photos <span class="required">*</span></label>
+                <div class="file-upload" onclick="document.getElementById('photoInput').click()">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    Tap to upload photos<br />
+                    <small style="color:#5a6f92;">JPEG, PNG (max 10 images)</small>
+                    <input type="file" id="photoInput" multiple accept="image/*" style="display:none;" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Additional Notes</label>
+                <textarea placeholder="Any observations or special instructions..."></textarea>
+            </div>
+            <div class="ai-response">
+                <h4>⚡ A.C.E. AI Analysis</h4>
+                <div class="observation">✅ Structural integrity: Nominal</div>
+                <div class="observation">⚠️ Rebar spacing: Check column 3</div>
+                <div class="observation">ℹ️ Concrete curing: In progress</div>
+            </div>
+            <button type="submit" class="submit-btn"><i class="fas fa-paper-plane"></i> Submit Stage Report</button>
+        </form>
+    `,
+    'contravention': `
+        <h2><i class="fas fa-exclamation-triangle"></i> Contravention Report</h2>
+        <form id="contraventionForm">
+            <div class="form-group">
+                <label>Project / Building <span class="required">*</span></label>
+                <input type="text" placeholder="e.g., 12 Allen Avenue" required />
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Stage <span class="required">*</span></label>
+                    <select required>
+                        <option value="">Select stage</option>
+                        <option>Ground Floor</option>
+                        <option>1st Floor</option>
+                        <option>2nd Floor</option>
+                        <option>3rd Floor</option>
+                        <option>Roof</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Severity <span class="required">*</span></label>
+                    <select required>
+                        <option value="">Select severity</option>
+                        <option>Critical</option>
+                        <option>High</option>
+                        <option>Medium</option>
+                        <option>Low</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Contravention Details <span class="required">*</span></label>
+                <textarea placeholder="Describe the violation..." required></textarea>
+            </div>
+            <div class="form-group">
+                <label>Upload Evidence <span class="required">*</span></label>
+                <div class="file-upload" onclick="document.getElementById('contraPhotoInput').click()">
+                    <i class="fas fa-camera"></i>
+                    Tap to upload evidence photos<br />
+                    <input type="file" id="contraPhotoInput" multiple accept="image/*" style="display:none;" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Recommended Action</label>
+                <div class="toggle-group">
+                    <button type="button" class="active">⚠️ Stop Work Order</button>
+                    <button type="button">🔒 Seal-Up Notice</button>
+                    <button type="button">🏚️ Demolition Notice</button>
+                </div>
+            </div>
+            <div class="ai-response">
+                <h4>⚡ A.C.E. AI Analysis</h4>
+                <div class="observation">🚨 Violation: Structural column exposed rebar</div>
+                <div class="observation">📋 Code Reference: LASBCA Regulation 7.2.1</div>
+                <div class="observation">⚖️ Recommended: Stop Work Order</div>
+            </div>
+            <button type="submit" class="submit-btn"><i class="fas fa-gavel"></i> Submit Contravention</button>
+        </form>
+    `,
+    'pca-audit': `
+        <h2><i class="fas fa-clipboard-check"></i> Post-Construction Audit</h2>
+        <form id="pcaForm">
+            <div class="form-group">
+                <label>Project Name <span class="required">*</span></label>
+                <input type="text" placeholder="Completed project name" required />
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Audit Date <span class="required">*</span></label>
+                    <input type="date" required />
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select>
+                        <option>Pass</option>
+                        <option>Fail</option>
+                        <option>Partial Pass</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Upload As-Built Photos</label>
+                <div class="file-upload" onclick="document.getElementById('pcaPhotoInput').click()">
+                    <i class="fas fa-images"></i>
+                    Tap to upload as-built photos<br />
+                    <input type="file" id="pcaPhotoInput" multiple accept="image/*" style="display:none;" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Auditor's Notes</label>
+                <textarea placeholder="Final observations and recommendations..."></textarea>
+            </div>
+            <div class="ai-response">
+                <h4>⚡ A.C.E. AI Analysis</h4>
+                <div class="observation">✅ Matches approved plans: 92%</div>
+                <div class="observation">⚠️ Minor deviations: Window alignment</div>
+                <div class="observation">📋 Recommendation: Issue Certificate of Completion</div>
+            </div>
+            <button type="submit" class="submit-btn"><i class="fas fa-check-circle"></i> Submit PCA Audit</button>
+        </form>
+    `
+};
+
+// Function to inject page content
+window.navigateTo = function(page) {
+    // Remove any existing page container
+    const existing = document.querySelector('.page-container');
+    if (existing) {
+        existing.remove();
+    }
+
+    const container = document.createElement('div');
+    container.className = 'page-container active';
+    container.innerHTML = `
+        <div class="page-header">
+            <h2>${pageTemplates[page] ? pageTemplates[page].split('\n')[0] || 'Loading...' : 'Page'}</h2>
+            <button class="close-btn" onclick="this.closest('.page-container').remove()">
+                <i class="fas fa-times"></i> Close
+            </button>
+        </div>
+        <div class="page-content">
+            ${pageTemplates[page] || '<p>Page under construction.</p>'}
+        </div>
+    `;
+    document.body.appendChild(container);
+
+    // Re-bind toggle buttons
+    container.querySelectorAll('.toggle-group button').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.closest('.toggle-group').querySelectorAll('button').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+
+    // Handle form submissions
+    const form = container.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            showToast('✅ Report submitted successfully!');
+            setTimeout(() => {
+                this.closest('.page-container').remove();
+            }, 1500);
+        });
+    }
+};
+
+// Toast function
+window.showToast = function(message) {
+    let toast = document.getElementById('toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'toast';
+        toast.className = 'toast';
+        document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.classList.add('show');
+    clearTimeout(toast._timeout);
+    toast._timeout = setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+};
