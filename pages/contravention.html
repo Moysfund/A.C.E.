@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Contravention - A.C.E.</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        .action-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .action-card:hover {
+            background: rgba(0, 212, 255, 0.05);
+            border-color: rgba(0, 212, 255, 0.2);
+        }
+        .action-card.selected {
+            border-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.08);
+        }
+        .action-card .icon {
+            font-size: 1.5rem;
+            width: 40px;
+            text-align: center;
+        }
+        .action-card .info h4 {
+            font-size: 0.9rem;
+            margin-bottom: 0.2rem;
+        }
+        .action-card .info p {
+            font-size: 0.75rem;
+            color: #5a6f92;
+        }
+        .severity-tag {
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .severity-critical {
+            background: rgba(255, 70, 70, 0.15);
+            color: #ff6b6b;
+        }
+        .severity-high {
+            background: rgba(255, 193, 7, 0.15);
+            color: #ffc107;
+        }
+        .severity-medium {
+            background: rgba(255, 152, 0, 0.15);
+            color: #ff9800;
+        }
+        .severity-low {
+            background: rgba(76, 175, 80, 0.15);
+            color: #4caf50;
+        }
+        .notice-preview {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+        .notice-preview .header {
+            border-bottom: 2px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .notice-preview .header h3 {
+            font-size: 1rem;
+            color: #ff6b6b;
+        }
+        .notice-preview .body {
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: #b9c8e6;
+        }
+        .notice-preview .footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 0.8rem;
+            margin-top: 0.8rem;
+            font-size: 0.75rem;
+            color: #5a6f92;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation -->
+    <div class="top-bar" style="position:fixed;top:0;left:0;right:0;z-index:50;">
+        <div class="logo">
+            <span style="font-size:1.6rem;">⚡</span>
+            A.C.E.
+            <small>Contravention</small>
+        </div>
+        <div class="top-actions">
+            <span class="badge"><i class="fas fa-circle" style="color:#4caf50;font-size:0.5rem;"></i> EPPPS live</span>
+            <div class="user">
+                <i class="fas fa-user-cog"></i>
+                <span style="font-size:0.8rem;font-weight:500;">Team A</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div style="padding:90px 20px 30px;max-width:800px;margin:0 auto;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+            <h1 style="font-size:1.8rem;font-weight:800;"><i class="fas fa-exclamation-triangle" style="color:#ff6b6b;"></i> Contravention Report</h1>
+            <button onclick="window.location.href='dashboard.html'" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);padding:0.6rem 1.2rem;border-radius:40px;color:#eef2f8;cursor:pointer;font-family:'Inter',sans-serif;">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+        </div>
+
+        <form id="contraventionForm">
+            <div class="form-group">
+                <label>Project / Building <span class="required">*</span></label>
+                <input type="text" id="contraProject" placeholder="e.g., 12 Allen Avenue" required />
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Stage <span class="required">*</span></label>
+                    <select id="contraStage" required>
+                        <option value="">Select stage</option>
+                        <option>Ground Floor</option>
+                        <option>1st Floor</option>
+                        <option>2nd Floor</option>
+                        <option>3rd Floor</option>
+                        <option>Roof</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Severity <span class="required">*</span></label>
+                    <select id="contraSeverity" required onchange="updateSeverity()">
+                        <option value="">Select severity</option>
+                        <option value="critical">Critical</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Contravention Details <span class="required">*</span></label>
+                <textarea id="contraDetails" placeholder="Describe the violation in detail..." required></textarea>
+            </div>
+            <div class="form-group">
+                <label>Upload Evidence <span class="required">*</span></label>
+                <div class="file-upload" onclick="document.getElementById('contraPhotoInput').click()">
+                    <i class="fas fa-camera"></i>
+                    Tap to upload evidence photos<br />
+                    <small style="color:#5a6f92;">JPEG, PNG (max 10 images)</small>
+                    <input type="file" id="contraPhotoInput" multiple accept="image/*" style="display:none;" onchange="handleContraPhotos(event)" />
+                </div>
+                <div class="photo-preview" id="contraPhotoPreview"></div>
+            </div>
+
+            <div class="form-group">
+                <label>Recommended Action <span class="required">*</span></label>
+                <div id="actionOptions">
+                    <div class="action-card" data-action="stop-work" onclick="selectAction(this)">
+                        <div class="icon">⚠️</div>
+                        <div class="info">
+                            <h4>Stop Work Order</h4>
+                            <p>Immediate halt of all construction activities</p>
+                        </div>
+                    </div>
+                    <div class="action-card" data-action="seal-up" onclick="selectAction(this)">
+                        <div class="icon">🔒</div>
+                        <div class="info">
+                            <h4>Seal-Up Notice</h4>
+                            <p>Lockdown of the building/structure</p>
+                        </div>
+                    </div>
+                    <div class="action-card" data-action="demolition" onclick="selectAction(this)">
+                        <div class="icon">🏚️</div>
+                        <div class="info">
+                            <h4>Demolition Notice</h4>
+                            <p>Complete demolition of the structure</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ai-response" style="margin-top:1.5rem;">
+                <h4>⚡ A.C.E. AI Analysis</h4>
+                <div class="observation" id="aiContra1">🔍 Analyzing violation severity...</div>
+                <div class="observation" id="aiContra2">📋 Cross-referencing LASBCA regulations...</div>
+                <div class="observation" id="aiContra3">⚖️ Recommended: <span id="aiRecommendation">-</span></div>
+            </div>
+
+            <!-- Notice Preview -->
+            <div class="notice-preview" id="noticePreview" style="display:none;">
+                <div class="header">
+                    <h3 id="noticeTitle">NOTICE</h3>
+                    <span id="noticeDate" style="font-size:0.8rem;color:#5a6f92;"></span>
+                </div>
+                <div class="body" id="noticeBody">
+                    <p><strong>To:</strong> <span id="noticeTo">-</span></p>
+                    <p><strong>Subject:</strong> <span id="noticeSubject">-</span></p>
+                    <p style="margin-top:0.8rem;" id="noticeDetails">-</p>
+                    <p style="margin-top:0.8rem;" id="noticeAction">-</p>
+                </div>
+                <div class="footer">
+                    <p>LASBCA · Oba Akinjobi Way, Ikeja · <span id="noticeFooterDate"></span></p>
+                    <p style="font-size:0.65rem;color:#5a6f92;">This notice is generated by A.C.E. Automated Compliance Engine</p>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn" style="margin-top:1.5rem;">
+                <i class="fas fa-gavel"></i> Submit Contravention
+            </button>
+        </form>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        let contraPhotos = [];
+        let selectedAction = null;
+
+        // Handle photos
+        function handleContraPhotos(event) {
+            const files = event.target.files;
+            for (let file of files) {
+                if (contraPhotos.length >= 10) break;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    contraPhotos.push(e.target.result);
+                    renderContraPhotos();
+                };
+                reader.readAsDataURL(file);
+            }
+            event.target.value = '';
+        }
+
+        function renderContraPhotos() {
+            const container = document.getElementById('contraPhotoPreview');
+            container.innerHTML = contraPhotos.map((src, index) => `
+                <div style="position:relative;display:inline-block;">
+                    <img src="${src}" alt="Upload ${index+1}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid rgba(255,255,255,0.1);" />
+                    <button onclick="removeContraPhoto(${index})" style="position:absolute;top:-8px;right:-8px;background:rgba(255,70,70,0.9);border:none;color:white;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;">
+                        ✕
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function removeContraPhoto(index) {
+            contraPhotos.splice(index, 1);
+            renderContraPhotos();
+        }
+
+        // Select action
+        function selectAction(el) {
+            document.querySelectorAll('.action-card').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedAction = el.dataset.action;
+            updateNotice();
+        }
+
+        // Update severity
+        function updateSeverity() {
+            const severity = document.getElementById('contraSeverity').value;
+            const el = document.getElementById('contraSeverity');
+            el.className = '';
+            if (severity) {
+                el.classList.add('severity-' + severity);
+            }
+            updateNotice();
+        }
+
+        // Update AI recommendations
+        function updateAI() {
+            const details = document.getElementById('contraDetails').value;
+            const severity = document.getElementById('contraSeverity').value;
+
+            document.getElementById('aiContra1').textContent = severity ?
+                `🔍 Severity: ${severity.toUpperCase()} - ${severity === 'critical' ? 'Immediate action required' : severity === 'high' ? 'Urgent action required' : 'Monitor and address'}` :
+                '🔍 Analyzing violation severity...';
+
+            document.getElementById('aiContra2').textContent = details ?
+                `📋 Violation identified: ${details.substring(0, 50)}${details.length > 50 ? '...' : ''}` :
+                '📋 Awaiting violation details...';
+
+            // Recommend action based on severity
+            let recommendation = '-';
+            if (severity === 'critical') recommendation = '🚨 Demolition Notice';
+            else if (severity === 'high') recommendation = '⚠️ Stop Work Order';
+            else if (severity === 'medium') recommendation = '🔒 Seal-Up Notice';
+            else if (severity === 'low') recommendation = 'ℹ️ Warning Notice';
+            document.getElementById('aiRecommendation').textContent = recommendation;
+
+            // Auto-select action based on severity
+            if (severity === 'critical') {
+                document.querySelectorAll('.action-card').forEach(c => c.classList.remove('selected'));
+                document.querySelector('[data-action="demolition"]').classList.add('selected');
+                selectedAction = 'demolition';
+            } else if (severity === 'high') {
+                document.querySelectorAll('.action-card').forEach(c => c.classList.remove('selected'));
+                document.querySelector('[data-action="stop-work"]').classList.add('selected');
+                selectedAction = 'stop-work';
+            } else if (severity === 'medium') {
+                document.querySelectorAll('.action-card').forEach(c => c.classList.remove('selected'));
+                document.querySelector('[data-action="seal-up"]').classList.add('selected');
+                selectedAction = 'seal-up';
+            }
+            updateNotice();
+        }
+
+        // Update notice preview
+        function updateNotice() {
+            const project = document.getElementById('contraProject').value || '[Project Name]';
+            const stage = document.getElementById('contraStage').value || '[Stage]';
+            const details = document.getElementById('contraDetails').value || '[Details pending]';
+            const severity = document.getElementById('contraSeverity').value || 'Unassigned';
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-NG', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            const actionMap = {
+                'stop-work': { title: 'STOP WORK ORDER', subject: 'Immediate Cessation of Construction Activities', action: 'All construction activities on the above-referenced project are hereby ordered to STOP IMMEDIATELY until further notice.' },
+                'seal-up': { title: 'SEAL-UP NOTICE', subject: 'Lockdown of Structure', action: 'The above-referenced building/structure is hereby ordered to be SEALED UP immediately. Access is prohibited until further notice.' },
+                'demolition': { title: 'DEMOLITION NOTICE', subject: 'Order for Complete Demolition', action: 'The above-referenced structure has been deemed structurally unsafe. You are hereby ordered to DEMOLISH the building within 7 days of this notice.' }
+            };
+
+            const actionData = actionMap[selectedAction] || { title: 'NOTICE', subject: 'Compliance Notice', action: 'Please comply with LASBCA regulations.' };
+
+            document.getElementById('noticeTitle').textContent = actionData.title;
+            document.getElementById('noticeDate').textContent = dateStr;
+            document.getElementById('noticeTo').textContent = `Owner/Developer of ${project}`;
+            document.getElementById('noticeSubject').textContent = `${actionData.subject} - ${stage}`;
+            document.getElementById('noticeDetails').textContent = `Violation: ${details}`;
+            document.getElementById('noticeAction').textContent = `Action Required: ${actionData.action}`;
+            document.getElementById('noticeFooterDate').textContent = dateStr;
+
+            document.getElementById('noticePreview').style.display = 'block';
+        }
+
+        // Form submission
+        document.getElementById('contraventionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Validate
+            if (!document.getElementById('contraProject').value.trim() ||
+                !document.getElementById('contraStage').value ||
+                !document.getElementById('contraSeverity').value ||
+                !document.getElementById('contraDetails').value.trim()) {
+                showToast('⚠️ Please fill in all required fields');
+                return;
+            }
+
+            if (contraPhotos.length === 0) {
+                showToast('⚠️ Please upload evidence photos');
+                return;
+            }
+
+            if (!selectedAction) {
+                showToast('⚠️ Please select a recommended action');
+                return;
+            }
+
+            showToast('⏳ Submitting contravention report...');
+
+            setTimeout(() => {
+                showToast('✅ Contravention submitted! Notices generated and saved.');
+                // Reset form
+                this.reset();
+                document.getElementById('contraPhotoPreview').innerHTML = '';
+                contraPhotos = [];
+                document.querySelectorAll('.action-card').forEach(c => c.classList.remove('selected'));
+                selectedAction = null;
+                document.getElementById('noticePreview').style.display = 'none';
+                document.getElementById('aiContra1').textContent = '🔍 Analyzing violation severity...';
+                document.getElementById('aiContra2').textContent = '📋 Cross-referencing LASBCA regulations...';
+                document.getElementById('aiRecommendation').textContent = '-';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 2000);
+        });
+
+        // Auto-update AI on input
+        document.getElementById('contraDetails').addEventListener('input', updateAI);
+        document.getElementById('contraProject').addEventListener('input', updateNotice);
+        document.getElementById('contraStage').addEventListener('change', updateNotice);
+
+        // Toast function
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        window.showToast = showToast;
+    </script>
+</body>
+                              </html>
