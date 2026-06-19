@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>PCA Audit - A.C.E.</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        .compliance-meter {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        .meter-bar {
+            height: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+        .meter-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 1s ease;
+            width: 0%;
+        }
+        .meter-fill.pass {
+            background: linear-gradient(90deg, #4caf50, #66bb6a);
+        }
+        .meter-fill.fail {
+            background: linear-gradient(90deg, #ff6b6b, #ff8a8a);
+        }
+        .meter-fill.partial {
+            background: linear-gradient(90deg, #ffc107, #ffd54f);
+        }
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        .checklist-item .status {
+            font-size: 1.2rem;
+        }
+        .checklist-item .status.pass {
+            color: #4caf50;
+        }
+        .checklist-item .status.fail {
+            color: #ff6b6b;
+        }
+        .checklist-item .status.partial {
+            color: #ffc107;
+        }
+        .checklist-item .item-label {
+            flex: 1;
+            font-size: 0.9rem;
+        }
+        .checklist-item .item-detail {
+            font-size: 0.75rem;
+            color: #5a6f92;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation -->
+    <div class="top-bar" style="position:fixed;top:0;left:0;right:0;z-index:50;">
+        <div class="logo">
+            <span style="font-size:1.6rem;">⚡</span>
+            A.C.E.
+            <small>PCA Audit</small>
+        </div>
+        <div class="top-actions">
+            <span class="badge"><i class="fas fa-circle" style="color:#4caf50;font-size:0.5rem;"></i> EPPPS live</span>
+            <div class="user">
+                <i class="fas fa-user-cog"></i>
+                <span style="font-size:0.8rem;font-weight:500;">Team A</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div style="padding:90px 20px 30px;max-width:800px;margin:0 auto;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+            <h1 style="font-size:1.8rem;font-weight:800;"><i class="fas fa-clipboard-check" style="color:#00d4ff;"></i> PCA Audit</h1>
+            <button onclick="window.location.href='dashboard.html'" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);padding:0.6rem 1.2rem;border-radius:40px;color:#eef2f8;cursor:pointer;font-family:'Inter',sans-serif;">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+        </div>
+
+        <form id="pcaForm">
+            <div class="form-group">
+                <label>Project Name <span class="required">*</span></label>
+                <input type="text" id="pcaProject" placeholder="e.g., Eko Tower Phase 2 (Completed)" required />
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Audit Date <span class="required">*</span></label>
+                    <input type="date" id="pcaDate" required />
+                </div>
+                <div class="form-group">
+                    <label>Auditor Name <span class="required">*</span></label>
+                    <input type="text" id="pcaAuditor" placeholder="e.g., Engr. Adebayo" required />
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Upload As-Built Photos</label>
+                <div class="file-upload" onclick="document.getElementById('pcaPhotoInput').click()">
+                    <i class="fas fa-images"></i>
+                    Tap to upload as-built photos<br />
+                    <small style="color:#5a6f92;">JPEG, PNG (max 10 images)</small>
+                    <input type="file" id="pcaPhotoInput" multiple accept="image/*" style="display:none;" onchange="handlePcaPhotos(event)" />
+                </div>
+                <div class="photo-preview" id="pcaPhotoPreview"></div>
+            </div>
+
+            <div class="form-group">
+                <label>Audit Checklist</label>
+                <div class="compliance-meter">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <span style="font-weight:600;">Overall Compliance Score</span>
+                        <span id="complianceScore" style="font-size:1.2rem;font-weight:800;color:#00d4ff;">0%</span>
+                    </div>
+                    <div class="meter-bar">
+                        <div class="meter-fill" id="complianceFill" style="width:0%;"></div>
+                    </div>
+                </div>
+
+                <div id="checklist">
+                    <div class="checklist-item">
+                        <span class="status pass" id="check1">✅</span>
+                        <div>
+                            <div class="item-label">Structural Integrity</div>
+                            <div class="item-detail">Pass - No visible defects</div>
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <span class="status pass" id="check2">✅</span>
+                        <div>
+                            <div class="item-label">Electrical Systems</div>
+                            <div class="item-detail">Pass - All systems operational</div>
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <span class="status pass" id="check3">✅</span>
+                        <div>
+                            <div class="item-label">Plumbing & Sanitation</div>
+                            <div class="item-detail">Pass - Approved standards met</div>
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <span class="status pass" id="check4">✅</span>
+                        <div>
+                            <div class="item-label">Fire Safety</div>
+                            <div class="item-detail">Pass - Fire exits and extinguishers present</div>
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <span class="status partial" id="check5">⚠️</span>
+                        <div>
+                            <div class="item-label">Accessibility (PWD)</div>
+                            <div class="item-detail">Partial - Ramp installed but grade exceeds standard</div>
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <span class="status pass" id="check6">✅</span>
+                        <div>
+                            <div class="item-label">Environmental Compliance</div>
+                            <div class="item-detail">Pass - Waste management plan in place</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Auditor's Final Notes</label>
+                <textarea id="pcaNotes" placeholder="Final observations, recommendations, and certification notes..." rows="4"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Recommendation</label>
+                <div class="toggle-group" id="recommendationGroup">
+                    <button type="button" class="active" data-rec="pass" onclick="selectRecommendation(this)">✅ Pass</button>
+                    <button type="button" data-rec="partial" onclick="selectRecommendation(this)">⚠️ Partial Pass</button>
+                    <button type="button" data-rec="fail" onclick="selectRecommendation(this)">❌ Fail</button>
+                </div>
+            </div>
+
+            <div class="ai-response">
+                <h4>⚡ A.C.E. AI Analysis</h4>
+                <div class="observation">✅ 92% compliance with approved plans</div>
+                <div class="observation">⚠️ Minor deviations: Window alignment on floor 3</div>
+                <div class="observation">📋 Recommendation: <span id="pcaRecommendation">Issue Certificate of Completion</span></div>
+            </div>
+
+            <button type="submit" class="submit-btn">
+                <i class="fas fa-check-circle"></i> Submit PCA Audit
+            </button>
+        </form>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        let pcaPhotos = [];
+        let selectedRecommendation = 'pass';
+
+        // Handle photos
+        function handlePcaPhotos(event) {
+            const files = event.target.files;
+            for (let file of files) {
+                if (pcaPhotos.length >= 10) break;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    pcaPhotos.push(e.target.result);
+                    renderPcaPhotos();
+                };
+                reader.readAsDataURL(file);
+            }
+            event.target.value = '';
+        }
+
+        function renderPcaPhotos() {
+            const container = document.getElementById('pcaPhotoPreview');
+            container.innerHTML = pcaPhotos.map((src, index) => `
+                <div style="position:relative;display:inline-block;">
+                    <img src="${src}" alt="Upload ${index+1}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid rgba(255,255,255,0.1);" />
+                    <button onclick="removePcaPhoto(${index})" style="position:absolute;top:-8px;right:-8px;background:rgba(255,70,70,0.9);border:none;color:white;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;">
+                        ✕
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function removePcaPhoto(index) {
+            pcaPhotos.splice(index, 1);
+            renderPcaPhotos();
+        }
+
+        // Select recommendation
+        function selectRecommendation(el) {
+            document.querySelectorAll('#recommendationGroup button').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            selectedRecommendation = el.dataset.rec;
+
+            const recMap = {
+                'pass': 'Issue Certificate of Completion',
+                'partial': 'Issue Certificate with Conditions',
+                'fail': 'Reject - Required Remedial Actions'
+            };
+            document.getElementById('pcaRecommendation').textContent = recMap[selectedRecommendation] || 'Issue Certificate of Completion';
+
+            // Update compliance score
+            let score = 92;
+            if (selectedRecommendation === 'pass') score = 95;
+            else if (selectedRecommendation === 'partial') score = 78;
+            else if (selectedRecommendation === 'fail') score = 45;
+
+            document.getElementById('complianceScore').textContent = score + '%';
+            const fill = document.getElementById('complianceFill');
+            fill.style.width = score + '%';
+            fill.className = 'meter-fill ' + selectedRecommendation;
+        }
+
+        // Form submission
+        document.getElementById('pcaForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Validate
+            if (!document.getElementById('pcaProject').value.trim() ||
+                !document.getElementById('pcaDate').value ||
+                !document.getElementById('pcaAuditor').value.trim()) {
+                showToast('⚠️ Please fill in all required fields');
+                return;
+            }
+
+            showToast('⏳ Processing PCA Audit...');
+
+            setTimeout(() => {
+                showToast('✅ PCA Audit submitted successfully! Certificate generated.');
+                this.reset();
+                document.getElementById('pcaPhotoPreview').innerHTML = '';
+                pcaPhotos = [];
+                document.getElementById('complianceScore').textContent = '92%';
+                document.getElementById('complianceFill').style.width = '92%';
+                document.getElementById('complianceFill').className = 'meter-fill pass';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 2000);
+        });
+
+        // Set default date
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('pcaDate').value = today;
+            document.getElementById('complianceFill').style.width = '92%';
+            document.getElementById('complianceFill').className = 'meter-fill pass';
+        });
+
+        // Toast function
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        window.showToast = showToast;
+    </script>
+</body>
+                          </html>
