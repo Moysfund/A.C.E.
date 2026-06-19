@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>LASBCA AI - Building Control</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+</head>
+<body>
+
+    <!-- ===== SPLASH OVERLAY (pop-up) ===== -->
+    <div id="splash-overlay">
+        <div class="splash-card">
+            <div class="splash-icon"><i class="fas fa-hard-hat"></i></div>
+            <h1>LASBCA<span>+AI</span></h1>
+            <div class="sub">Building Control · Reimagined</div>
+            <div class="splash-stats">
+                <div>
+                    <span class="num">27,233</span>
+                    <span class="label">Violations (2023-26)</span>
+                </div>
+                <div>
+                    <span class="num">349</span>
+                    <span class="label">Demolitions</span>
+                </div>
+                <div>
+                    <span class="num">8,099</span>
+                    <span class="label">Stage Inspections</span>
+                </div>
+            </div>
+            <p class="splash-info">
+                <i class="fas fa-check-circle" style="color:#4caf50;"></i> EPPPS digital mandate active<br />
+                <i class="fas fa-users" style="color:#f5b042;"></i> 140+ Certified Accreditors (CAP)
+            </p>
+            <button class="splash-btn" id="enterBtn">
+                <i class="fas fa-arrow-right"></i> Enter 3D Dashboard
+            </button>
+            <div class="splash-footer">LASBCA · Oba Akinjobi Way, Ikeja</div>
+        </div>
+    </div>
+
+    <!-- ===== MAIN UI ===== -->
+    <div id="main-ui">
+        <!-- top bar -->
+        <div class="top-bar">
+            <div class="logo">
+                <i class="fas fa-city"></i>
+                LASBCA<span style="color:#f5b042;">•AI</span>
+                <small>v2.0</small>
+            </div>
+            <div class="top-actions">
+                <span class="badge"><i class="fas fa-circle" style="color:#4caf50; font-size:0.5rem;"></i> EPPPS live</span>
+                <div class="user">
+                    <i class="fas fa-user-cog"></i>
+                    <span style="font-size:0.8rem; font-weight:500;">Team A</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- live stats (floating) -->
+        <div class="live-stats">
+            <div class="stat-item"><span class="stat-title">📋 Stage Reports</span><span class="val">2,341</span></div>
+            <div class="stat-item"><span class="stat-title">🚨 Contraventions</span><span class="val">187</span></div>
+            <div class="stat-item"><span class="stat-title">🏗️ Active Projects</span><span class="val">96</span></div>
+            <div class="stat-item" style="margin-top:4px; border-top:1px solid rgba(255,215,0,0.1); padding-top:6px;">
+                <span class="stat-title"><i class="fas fa-robot" style="color:#f5b042;"></i> AI observations</span>
+                <span class="val" style="color:#8effa0;">live</span>
+            </div>
+        </div>
+
+        <!-- bottom CTA -->
+        <div class="cta-panel">
+            <button onclick="navigateTo('stage-report')"><i class="fas fa-camera"></i> New Stage Report</button>
+            <button onclick="navigateTo('contravention')"><i class="fas fa-exclamation-triangle"></i> Contravention</button>
+            <button onclick="navigateTo('pca-audit')"><i class="fas fa-clipboard-check"></i> PCA Audit</button>
+            <button onclick="syncGoogleSheet()" style="border-color:rgba(245,176,66,0.3);"><i class="fas fa-sync-alt"></i> Sync Google Sheet</button>
+        </div>
+    </div>
+
+    <!-- ===== 3D CANVAS ===== -->
+    <div id="canvas-container"></div>
+
+    <!-- ===== THREE.JS FROM CDN ===== -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.126.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.126.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
