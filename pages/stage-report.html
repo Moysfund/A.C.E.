@@ -279,4 +279,200 @@
                 <h2>Report Submitted!</h2>
                 <p style="color:#889bc2;">Your stage report has been successfully submitted and synced with Google Sheets.</p>
                 <div style="margin-top:1rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
-                    <button onclick="window.location.href='stage-report.html'" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,
+                    <button onclick="window.location.href='stage-report.html'" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);padding:0.6rem 1.5rem;border-radius:40px;color:#eef2f8;cursor:pointer;font-family:'Inter',sans-serif;">
+                        <i class="fas fa-plus"></i> New Report
+                    </button>
+                    <button onclick="window.location.href='dashboard.html'" style="background:linear-gradient(135deg,#00d4ff,#0088cc);border:none;padding:0.6rem 1.5rem;border-radius:40px;color:#0b0f1a;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">
+                        <i class="fas fa-chart-bar"></i> Dashboard
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        let currentStep = 1;
+        let uploadedPhotos = [];
+        let photoFiles = [];
+
+        // Handle photo upload
+        function handlePhotos(event) {
+            const files = event.target.files;
+            for (let file of files) {
+                if (uploadedPhotos.length >= 10) break;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedPhotos.push(e.target.result);
+                    photoFiles.push(file);
+                    renderPhotos();
+                };
+                reader.readAsDataURL(file);
+            }
+            event.target.value = '';
+        }
+
+        function renderPhotos() {
+            const container = document.getElementById('photoPreview');
+            container.innerHTML = uploadedPhotos.map((src, index) => `
+                <div style="position:relative;display:inline-block;">
+                    <img src="${src}" alt="Upload ${index+1}" />
+                    <button onclick="removePhoto(${index})" style="position:absolute;top:-8px;right:-8px;background:rgba(255,70,70,0.9);border:none;color:white;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;">
+                        ✕
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function removePhoto(index) {
+            uploadedPhotos.splice(index, 1);
+            photoFiles.splice(index, 1);
+            renderPhotos();
+        }
+
+        // Step navigation
+        function nextStep(step) {
+            // Validation for step 1
+            if (step === 2) {
+                const project = document.getElementById('projectName').value.trim();
+                const stage = document.getElementById('stageSelect').value;
+                const team = document.getElementById('teamSelect').value;
+                const location = document.getElementById('location').value.trim();
+                if (!project || !stage || !team || !location) {
+                    showToast('⚠️ Please fill in all required fields');
+                    return;
+                }
+            }
+            // Validation for step 2
+            if (step === 3 && uploadedPhotos.length === 0) {
+                showToast('⚠️ Please upload at least one photo');
+                return;
+            }
+            // Validation for step 3 (simulate AI processing)
+            if (step === 4) {
+                // Simulate AI processing if not done
+                if (!document.getElementById('aiObs1').textContent.includes('✅')) {
+                    runAIAnalysis();
+                }
+                // Update summary
+                document.getElementById('summaryProject').textContent = document.getElementById('projectName').value;
+                document.getElementById('summaryStage').textContent = document.getElementById('stageSelect').value;
+                document.getElementById('summaryTeam').textContent = document.getElementById('teamSelect').value;
+                document.getElementById('summaryPhotos').textContent = uploadedPhotos.length + ' photos';
+            }
+
+            // Hide all steps
+            document.getElementById('step1Content').style.display = 'none';
+            document.getElementById('step2Content').style.display = 'none';
+            document.getElementById('step3Content').style.display = 'none';
+            document.getElementById('step4Content').style.display = 'none';
+
+            // Show target step
+            document.getElementById('step' + step + 'Content').style.display = 'block';
+
+            // Update step indicators
+            for (let i = 1; i <= 4; i++) {
+                const stepEl = document.getElementById('step' + i);
+                stepEl.classList.remove('active', 'completed');
+                if (i < step) stepEl.classList.add('completed');
+                if (i === step) stepEl.classList.add('active');
+            }
+
+            currentStep = step;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function prevStep(step) {
+            nextStep(step);
+        }
+
+        // Simulate AI analysis
+        function runAIAnalysis() {
+            const observations = [
+                '✅ Structural integrity: Nominal',
+                '⚠️ Rebar spacing: Check column 3 (slightly wide)',
+                '✅ Concrete curing: In progress - 7 days',
+                'ℹ️ Formwork alignment: Within tolerance',
+                '⚠️ Safety: Missing edge protection on floor 2',
+                '✅ Electrical conduits: Properly installed',
+                'ℹ️ Plumbing: Verified with approved plan'
+            ];
+
+            let delay = 0;
+            observations.forEach((obs, index) => {
+                setTimeout(() => {
+                    const el = document.getElementById('aiObs' + (index + 1));
+                    if (el) {
+                        el.textContent = obs;
+                        if (obs.includes('✅')) {
+                            el.style.color = '#4caf50';
+                        } else if (obs.includes('⚠️')) {
+                            el.style.color = '#ffc107';
+                        } else {
+                            el.style.color = '#889bc2';
+                        }
+                    }
+                }, delay);
+                delay += 800;
+            });
+
+            // Show completion after all observations
+            setTimeout(() => {
+                document.querySelector('#step3Content .ai-response').innerHTML += `
+                    <div class="observation" style="color:#00d4ff;font-weight:700;border-top:1px solid rgba(255,255,255,0.05);margin-top:0.5rem;padding-top:0.5rem;">
+                        ✅ AI Analysis Complete - Ready for review
+                    </div>
+                `;
+            }, delay + 500);
+        }
+
+        // Form submission
+        document.getElementById('stageReportForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Simulate submission
+            showToast('⏳ Submitting report...');
+
+            setTimeout(() => {
+                // Hide all steps
+                document.getElementById('step1Content').style.display = 'none';
+                document.getElementById('step2Content').style.display = 'none';
+                document.getElementById('step3Content').style.display = 'none';
+                document.getElementById('step4Content').style.display = 'none';
+
+                // Show success
+                document.getElementById('successState').classList.add('show');
+
+                // Update step indicators
+                for (let i = 1; i <= 4; i++) {
+                    document.getElementById('step' + i).classList.add('completed');
+                }
+
+                showToast('✅ Report submitted successfully! Synced with Google Sheets.');
+            }, 2000);
+        });
+
+        // Toast function
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        window.showToast = showToast;
+
+        // Auto-run AI on step 3
+        document.addEventListener('DOMContentLoaded', function() {
+            // Pre-fill some sample data for demo
+            document.getElementById('projectName').value = 'Eko Tower Phase 2';
+            document.getElementById('location').value = '12 Allen Avenue, Ikeja';
+        });
+    </script>
+</body>
+</html>
