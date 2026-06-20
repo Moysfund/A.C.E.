@@ -408,6 +408,8 @@
     <!-- Toast -->
     <div id="toast" class="toast"></div>
 
+    <!-- ===== SCRIPTS ===== -->
+    <script src="../storage.js"></script>
     <script src="../pdf-generator.js"></script>
 
     <script>
@@ -557,9 +559,11 @@
             }, delay + 500);
         }
 
+        // ===== SUBMIT HANDLER WITH LOCAL STORAGE =====
         document.getElementById('stageReportForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
+            // Collect all form data
             const data = {
                 id: document.getElementById('stageReportNo').value || 'SR-' + Date.now().toString().slice(-6),
                 reportNo: document.getElementById('stageReportNo').value,
@@ -567,24 +571,33 @@
                 project: document.getElementById('projectName').value,
                 developer: document.getElementById('developerName').value,
                 address: document.getElementById('siteAddress').value,
-                stage: document.getElementById('stageNumber').value + ' (' + document.getElementById('stageType').value + ')',
+                stageNumber: document.getElementById('stageNumber').value,
+                stageType: document.getElementById('stageType').value,
                 team: document.getElementById('teamSelect').value,
                 teamHead: document.getElementById('teamHead').value,
                 detectionDate: document.getElementById('detectionDate').value,
                 reportDate: document.getElementById('reportDate').value,
                 signature: document.getElementById('signature').value || 'Signed',
                 status: 'Submitted',
+                submittedAt: new Date().toISOString(),
+                photos: uploadedPhotos.length
+            };
+
+            // SAVE TO LOCAL STORAGE
+            saveStageReport(data);
+
+            showToast('⏳ Saving report and generating PDF...');
+
+            // Generate PDF
+            generateStageReportPDF({
+                ...data,
+                stage: data.stageNumber + ' (' + data.stageType + ')',
                 observations: [
                     '✅ Structural integrity: Nominal',
                     '⚠️ Rebar spacing: Check column 3',
                     '✅ Concrete curing: In progress'
-                ],
-                photos: uploadedPhotos.length
-            };
-
-            showToast('⏳ Generating PDF report...');
-
-            generateStageReportPDF(data).then(() => {
+                ]
+            }).then(() => {
                 document.getElementById('step1Content').style.display = 'none';
                 document.getElementById('step2Content').style.display = 'none';
                 document.getElementById('step3Content').style.display = 'none';
@@ -594,13 +607,13 @@
                 document.getElementById('successState').innerHTML = `
                     <i class="fas fa-check-circle"></i>
                     <h2>Report Submitted!</h2>
-                    <p style="color:#889bc2;">Your stage report has been successfully submitted and PDF generated.</p>
+                    <p style="color:#889bc2;">Your stage report has been saved and PDF generated.</p>
                     <div style="margin-top:1rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
                         <button onclick="window.location.href='stage-report.html'" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);padding:0.6rem 1.5rem;border-radius:40px;color:#eef2f8;cursor:pointer;font-family:'Inter',sans-serif;">
                             <i class="fas fa-plus"></i> New Report
                         </button>
-                        <button onclick="generateStageReportPDF(${JSON.stringify(data).replace(/"/g, '&quot;')})" style="background:linear-gradient(135deg,#00d4ff,#0088cc);border:none;padding:0.6rem 1.5rem;border-radius:40px;color:#0b0f1a;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">
-                            <i class="fas fa-file-pdf"></i> Download PDF Again
+                        <button onclick="window.location.href='reports.html'" style="background:linear-gradient(135deg,#00d4ff,#0088cc);border:none;padding:0.6rem 1.5rem;border-radius:40px;color:#0b0f1a;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">
+                            <i class="fas fa-list"></i> View All Reports
                         </button>
                         <button onclick="window.location.href='dashboard.html'" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);padding:0.6rem 1.5rem;border-radius:40px;color:#eef2f8;cursor:pointer;font-family:'Inter',sans-serif;">
                             <i class="fas fa-chart-bar"></i> Dashboard
@@ -612,7 +625,7 @@
                     document.getElementById('step' + i).classList.add('completed');
                 }
 
-                showToast('✅ PDF Report downloaded!');
+                showToast('✅ Report saved and PDF downloaded!');
             }).catch(err => {
                 showToast('❌ Error generating PDF: ' + err.message);
             });
