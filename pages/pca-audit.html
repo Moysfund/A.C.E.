@@ -107,13 +107,24 @@
             outline: none;
             border-bottom: 1px solid #00d4ff;
         }
+        .lasbca-badge {
+            background: #00d4ff;
+            color: #0b0f1a;
+            padding: 3px 14px;
+            border-radius: 4px;
+            font-weight: 800;
+            font-size: 0.7rem;
+            letter-spacing: 1.5px;
+            display: inline-block;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
     <!-- Top Navigation -->
     <div class="top-bar" style="position:fixed;top:0;left:0;right:0;z-index:50;">
         <div class="logo" style="display:flex; align-items:center; gap:10px;">
-            <span class="lasbca-badge">🏛️ LASBCA</span>
+            <span class="lasbca-badge">LASBCA</span>
             <span style="font-size:1.6rem;">⚡</span>
             A.C.E.
             <small>PCA Audit</small>
@@ -302,14 +313,12 @@
     <!-- Toast -->
     <div id="toast" class="toast"></div>
 
-    <!-- ===== PDF GENERATOR ===== -->
     <script src="../pdf-generator.js"></script>
 
     <script>
         let pcaPhotos = [];
         let selectedRecommendation = 'pass';
 
-        // Set default dates
         document.addEventListener('DOMContentLoaded', function() {
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('pcaDate').value = today;
@@ -372,7 +381,6 @@
             fill.className = 'meter-fill ' + selectedRecommendation;
         }
 
-        // ===== SUBMIT HANDLER WITH PDF =====
         document.getElementById('pcaForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -444,4 +452,4 @@
         window.showToast = showToast;
     </script>
 </body>
-</html>
+                                                                 </html>
