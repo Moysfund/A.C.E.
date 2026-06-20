@@ -64,6 +64,19 @@
             font-size: 0.75rem;
             color: #5a6f92;
         }
+        .photo-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .photo-preview img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -206,6 +219,9 @@
     <!-- Toast -->
     <div id="toast" class="toast"></div>
 
+    <!-- ===== PDF GENERATOR ===== -->
+    <script src="../pdf-generator.js"></script>
+
     <script>
         let pcaPhotos = [];
         let selectedRecommendation = 'pass';
@@ -255,7 +271,6 @@
             };
             document.getElementById('pcaRecommendation').textContent = recMap[selectedRecommendation] || 'Issue Certificate of Completion';
 
-            // Update compliance score
             let score = 92;
             if (selectedRecommendation === 'pass') score = 95;
             else if (selectedRecommendation === 'partial') score = 78;
@@ -267,11 +282,10 @@
             fill.className = 'meter-fill ' + selectedRecommendation;
         }
 
-        // Form submission
+        // ===== SUBMIT HANDLER WITH PDF =====
         document.getElementById('pcaForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
-            // Validate
             if (!document.getElementById('pcaProject').value.trim() ||
                 !document.getElementById('pcaDate').value ||
                 !document.getElementById('pcaAuditor').value.trim()) {
@@ -279,18 +293,35 @@
                 return;
             }
 
-            showToast('⏳ Processing PCA Audit...');
+            const data = {
+                id: 'PCA-' + Date.now().toString().slice(-6),
+                project: document.getElementById('pcaProject').value,
+                auditor: document.getElementById('pcaAuditor').value,
+                date: document.getElementById('pcaDate').value,
+                status: selectedRecommendation || 'pass',
+                score: parseInt(document.getElementById('complianceScore').textContent) || 92,
+                notes: document.getElementById('pcaNotes').value || 'Audit completed successfully.',
+                photos: pcaPhotos.length
+            };
 
-            setTimeout(() => {
-                showToast('✅ PCA Audit submitted successfully! Certificate generated.');
+            showToast('⏳ Generating PCA report...');
+
+            generatePCAPDF(data).then(() => {
+                showToast('✅ PCA Audit submitted! PDF downloaded.');
                 this.reset();
                 document.getElementById('pcaPhotoPreview').innerHTML = '';
                 pcaPhotos = [];
                 document.getElementById('complianceScore').textContent = '92%';
                 document.getElementById('complianceFill').style.width = '92%';
                 document.getElementById('complianceFill').className = 'meter-fill pass';
+                document.getElementById('pcaRecommendation').textContent = 'Issue Certificate of Completion';
+                document.querySelectorAll('#recommendationGroup button').forEach(b => b.classList.remove('active'));
+                document.querySelector('[data-rec="pass"]').classList.add('active');
+                selectedRecommendation = 'pass';
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-            }, 2000);
+            }).catch(err => {
+                showToast('❌ Error generating PDF: ' + err.message);
+            });
         });
 
         // Set default date
@@ -315,4 +346,4 @@
         window.showToast = showToast;
     </script>
 </body>
-                          </html>
+</html>
