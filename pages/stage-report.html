@@ -21,22 +21,6 @@
             border-radius: 8px;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .photo-preview .remove-photo {
-            position: relative;
-            top: -10px;
-            right: 10px;
-            background: rgba(255, 70, 70, 0.8);
-            border: none;
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            font-size: 10px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
         .step-indicator {
             display: flex;
             justify-content: space-between;
@@ -330,7 +314,7 @@
             <div class="submit-success" id="successState">
                 <i class="fas fa-check-circle"></i>
                 <h2>Report Submitted!</h2>
-                <p style="color:#889bc2;">Your stage report has been successfully submitted.</p>
+                <p style="color:#889bc2;">Your stage report has been successfully submitted and PDF generated.</p>
                 <div style="margin-top:1rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
                     <button onclick="window.location.href='stage-report.html'" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);padding:0.6rem 1.5rem;border-radius:40px;color:#eef2f8;cursor:pointer;font-family:'Inter',sans-serif;">
                         <i class="fas fa-plus"></i> New Report
@@ -345,6 +329,9 @@
 
     <!-- Toast -->
     <div id="toast" class="toast"></div>
+
+    <!-- ===== PDF GENERATOR ===== -->
+    <script src="../pdf-generator.js"></script>
 
     <script>
         let currentStep = 1;
@@ -377,7 +364,7 @@
             const container = document.getElementById('photoPreview');
             container.innerHTML = uploadedPhotos.map((src, index) => `
                 <div style="position:relative;display:inline-block;">
-                    <img src="${src}" alt="Upload ${index+1}" />
+                    <img src="${src}" alt="Upload ${index+1}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid rgba(255,255,255,0.1);" />
                     <button onclick="removePhoto(${index})" style="position:absolute;top:-8px;right:-8px;background:rgba(255,70,70,0.9);border:none;color:white;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;">
                         ✕
                     </button>
@@ -393,7 +380,6 @@
 
         // Step navigation
         function nextStep(step) {
-            // Validation for step 1
             if (step === 2) {
                 const fields = [
                     'projectName', 'developerName', 'permitNumber', 'siteAddress',
@@ -414,18 +400,14 @@
                     return;
                 }
             }
-            // Validation for step 2
             if (step === 3 && uploadedPhotos.length === 0) {
                 showToast('⚠️ Please upload at least one photo');
                 return;
             }
-            // Validation for step 3 (simulate AI processing)
             if (step === 4) {
-                // Simulate AI processing if not done
                 if (!document.getElementById('aiObs1').textContent.includes('✅')) {
                     runAIAnalysis();
                 }
-                // Update summary
                 document.getElementById('summaryProject').textContent = document.getElementById('projectName').value;
                 document.getElementById('summaryDeveloper').textContent = document.getElementById('developerName').value;
                 document.getElementById('summaryPermit').textContent = document.getElementById('permitNumber').value;
@@ -436,16 +418,13 @@
                 document.getElementById('summaryDate').textContent = document.getElementById('inspectionDate').value;
             }
 
-            // Hide all steps
             document.getElementById('step1Content').style.display = 'none';
             document.getElementById('step2Content').style.display = 'none';
             document.getElementById('step3Content').style.display = 'none';
             document.getElementById('step4Content').style.display = 'none';
 
-            // Show target step
             document.getElementById('step' + step + 'Content').style.display = 'block';
 
-            // Update step indicators
             for (let i = 1; i <= 4; i++) {
                 const stepEl = document.getElementById('step' + i);
                 stepEl.classList.remove('active', 'completed');
@@ -461,7 +440,6 @@
             nextStep(step);
         }
 
-        // Simulate AI analysis
         function runAIAnalysis() {
             const observations = [
                 '✅ Structural integrity: Nominal',
@@ -491,7 +469,6 @@
                 delay += 800;
             });
 
-            // Show completion after all observations
             setTimeout(() => {
                 document.querySelector('#step3Content .ai-response').innerHTML += `
                     <div class="observation" style="color:#00d4ff;font-weight:700;border-top:1px solid rgba(255,255,255,0.05);margin-top:0.5rem;padding-top:0.5rem;">
@@ -501,29 +478,62 @@
             }, delay + 500);
         }
 
-        // Form submission
+        // ===== SUBMIT HANDLER WITH PDF =====
         document.getElementById('stageReportForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
-            showToast('⏳ Submitting report...');
+            const data = {
+                id: 'SR-' + Date.now().toString().slice(-6),
+                project: document.getElementById('projectName').value,
+                developer: document.getElementById('developerName').value,
+                permit: document.getElementById('permitNumber').value,
+                address: document.getElementById('siteAddress').value,
+                stage: document.getElementById('stageNumber').value + ' (' + document.getElementById('stageType').value + ')',
+                team: document.getElementById('teamSelect').value,
+                date: document.getElementById('inspectionDate').value || new Date().toLocaleDateString(),
+                status: 'Submitted',
+                observations: [
+                    '✅ Structural integrity: Nominal',
+                    '⚠️ Rebar spacing: Check column 3',
+                    '✅ Concrete curing: In progress'
+                ],
+                photos: uploadedPhotos.length
+            };
 
-            setTimeout(() => {
-                // Hide all steps
+            showToast('⏳ Generating PDF report...');
+
+            generateStageReportPDF(data).then(() => {
                 document.getElementById('step1Content').style.display = 'none';
                 document.getElementById('step2Content').style.display = 'none';
                 document.getElementById('step3Content').style.display = 'none';
                 document.getElementById('step4Content').style.display = 'none';
 
-                // Show success
                 document.getElementById('successState').classList.add('show');
+                document.getElementById('successState').innerHTML = `
+                    <i class="fas fa-check-circle"></i>
+                    <h2>Report Submitted!</h2>
+                    <p style="color:#889bc2;">Your stage report has been successfully submitted and PDF generated.</p>
+                    <div style="margin-top:1rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+                        <button onclick="window.location.href='stage-report.html'" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);padding:0.6rem 1.5rem;border-radius:40px;color:#eef2f8;cursor:pointer;font-family:'Inter',sans-serif;">
+                            <i class="fas fa-plus"></i> New Report
+                        </button>
+                        <button onclick="generateStageReportPDF(${JSON.stringify(data).replace(/"/g, '&quot;')})" style="background:linear-gradient(135deg,#00d4ff,#0088cc);border:none;padding:0.6rem 1.5rem;border-radius:40px;color:#0b0f1a;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">
+                            <i class="fas fa-file-pdf"></i> Download PDF Again
+                        </button>
+                        <button onclick="window.location.href='dashboard.html'" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);padding:0.6rem 1.5rem;border-radius:40px;color:#eef2f8;cursor:pointer;font-family:'Inter',sans-serif;">
+                            <i class="fas fa-chart-bar"></i> Dashboard
+                        </button>
+                    </div>
+                `;
 
-                // Update step indicators
                 for (let i = 1; i <= 4; i++) {
                     document.getElementById('step' + i).classList.add('completed');
                 }
 
-                showToast('✅ Report submitted successfully!');
-            }, 2000);
+                showToast('✅ PDF Report downloaded!');
+            }).catch(err => {
+                showToast('❌ Error generating PDF: ' + err.message);
+            });
         });
 
         // Toast function
@@ -540,4 +550,4 @@
         window.showToast = showToast;
     </script>
 </body>
-</html>
+    </html>
