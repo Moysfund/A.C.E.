@@ -106,6 +106,19 @@
         .form-section-title i {
             margin-right: 8px;
         }
+        .photo-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .photo-preview img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -290,6 +303,9 @@
     <!-- Toast -->
     <div id="toast" class="toast"></div>
 
+    <!-- ===== PDF GENERATOR ===== -->
+    <script src="../pdf-generator.js"></script>
+
     <script>
         let contraPhotos = [];
         let selectedAction = null;
@@ -359,7 +375,6 @@
                 `📋 Violation identified: ${details.substring(0, 50)}${details.length > 50 ? '...' : ''}` :
                 '📋 Awaiting violation details...';
 
-            // Recommend action based on severity
             let recommendation = '-';
             if (severity === 'critical') recommendation = '🚨 Demolition Notice';
             else if (severity === 'high') recommendation = '⚠️ Stop Work Order';
@@ -367,7 +382,6 @@
             else if (severity === 'low') recommendation = 'ℹ️ Warning Notice';
             document.getElementById('aiRecommendation').textContent = recommendation;
 
-            // Auto-select action based on severity
             if (severity === 'critical') {
                 document.querySelectorAll('.action-card').forEach(c => c.classList.remove('selected'));
                 document.querySelector('[data-action="demolition"]').classList.add('selected');
@@ -417,11 +431,10 @@
             document.getElementById('noticePreview').style.display = 'block';
         }
 
-        // Form submission
+        // ===== SUBMIT HANDLER WITH PDF =====
         document.getElementById('contraventionForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
-            // Validate
             const required = ['contraProject', 'contraDeveloper', 'contraPermit', 'contraAddress', 'contraStageNumber', 'contraStageType', 'contraTeam', 'contraSeverity', 'contraDetails'];
             let valid = true;
             required.forEach(id => {
@@ -449,11 +462,25 @@
                 return;
             }
 
-            showToast('⏳ Submitting contravention report...');
+            const data = {
+                id: 'CV-' + Date.now().toString().slice(-6),
+                project: document.getElementById('contraProject').value,
+                developer: document.getElementById('contraDeveloper').value,
+                permit: document.getElementById('contraPermit').value,
+                address: document.getElementById('contraAddress').value,
+                stage: document.getElementById('contraStageNumber').value + ' (' + document.getElementById('contraStageType').value + ')',
+                team: document.getElementById('contraTeam').value,
+                severity: document.getElementById('contraSeverity').value,
+                date: new Date().toLocaleDateString(),
+                details: document.getElementById('contraDetails').value,
+                action: document.querySelector('.action-card.selected .info h4')?.textContent || 'Notice',
+                photos: contraPhotos.length
+            };
 
-            setTimeout(() => {
-                showToast('✅ Contravention submitted! Notices generated.');
-                // Reset form
+            showToast('⏳ Generating contravention notice...');
+
+            generateContraventionPDF(data).then(() => {
+                showToast('✅ Contravention submitted! PDF downloaded.');
                 this.reset();
                 document.getElementById('contraPhotoPreview').innerHTML = '';
                 contraPhotos = [];
@@ -464,7 +491,9 @@
                 document.getElementById('aiContra2').textContent = '📋 Cross-referencing LASBCA regulations...';
                 document.getElementById('aiRecommendation').textContent = '-';
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-            }, 2000);
+            }).catch(err => {
+                showToast('❌ Error generating PDF: ' + err.message);
+            });
         });
 
         // Auto-update AI on input
@@ -491,4 +520,4 @@
         window.showToast = showToast;
     </script>
 </body>
-    </html>
+                        </html>
