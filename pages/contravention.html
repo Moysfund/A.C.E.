@@ -95,6 +95,17 @@
             font-size: 0.75rem;
             color: #5a6f92;
         }
+        .form-section-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #ff6b6b;
+            margin: 1.5rem 0 1rem;
+            padding-bottom: 0.3rem;
+            border-bottom: 1px solid rgba(255, 107, 107, 0.1);
+        }
+        .form-section-title i {
+            margin-right: 8px;
+        }
     </style>
 </head>
 <body>
@@ -124,20 +135,65 @@
         </div>
 
         <form id="contraventionForm">
+            <!-- Property Information -->
+            <div class="form-section-title"><i class="fas fa-building"></i> Property Information</div>
+            
             <div class="form-group">
-                <label>Project / Building <span class="required">*</span></label>
+                <label>Project / Building Name <span class="required">*</span></label>
                 <input type="text" id="contraProject" placeholder="e.g., 12 Allen Avenue" required />
             </div>
+            
+            <div class="form-group">
+                <label>Developer Name <span class="required">*</span></label>
+                <input type="text" id="contraDeveloper" placeholder="e.g., Eko Development Ltd" required />
+            </div>
+            
+            <div class="form-group">
+                <label>Permit Number <span class="required">*</span></label>
+                <input type="text" id="contraPermit" placeholder="e.g., LASBCA-2026-045" required />
+            </div>
+            
+            <div class="form-group">
+                <label>Site Address <span class="required">*</span></label>
+                <input type="text" id="contraAddress" placeholder="e.g., 12 Allen Avenue, Ikeja, Lagos" required />
+            </div>
+
+            <!-- Violation Information -->
+            <div class="form-section-title"><i class="fas fa-exclamation-circle"></i> Violation Information</div>
+            
             <div class="form-row">
                 <div class="form-group">
-                    <label>Stage <span class="required">*</span></label>
-                    <select id="contraStage" required>
-                        <option value="">Select stage</option>
+                    <label>Stage Number <span class="required">*</span></label>
+                    <input type="text" id="contraStageNumber" placeholder="e.g., Stage 3 or 3rd Floor" required />
+                </div>
+                <div class="form-group">
+                    <label>Stage Type <span class="required">*</span></label>
+                    <select id="contraStageType" required>
+                        <option value="">Select type</option>
                         <option>Ground Floor</option>
                         <option>1st Floor</option>
                         <option>2nd Floor</option>
                         <option>3rd Floor</option>
+                        <option>4th Floor</option>
+                        <option>5th Floor</option>
                         <option>Roof</option>
+                        <option>Foundation</option>
+                        <option>Structural Frame</option>
+                        <option>Finishing</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Team <span class="required">*</span></label>
+                    <select id="contraTeam" required>
+                        <option value="">Select team</option>
+                        <option>Team A</option>
+                        <option>Team B</option>
+                        <option>Team C</option>
+                        <option>Special Team</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -151,10 +207,12 @@
                     </select>
                 </div>
             </div>
+            
             <div class="form-group">
                 <label>Contravention Details <span class="required">*</span></label>
                 <textarea id="contraDetails" placeholder="Describe the violation in detail..." required></textarea>
             </div>
+            
             <div class="form-group">
                 <label>Upload Evidence <span class="required">*</span></label>
                 <div class="file-upload" onclick="document.getElementById('contraPhotoInput').click()">
@@ -166,8 +224,11 @@
                 <div class="photo-preview" id="contraPhotoPreview"></div>
             </div>
 
+            <!-- Recommended Action -->
+            <div class="form-section-title"><i class="fas fa-gavel"></i> Recommended Action</div>
+            
             <div class="form-group">
-                <label>Recommended Action <span class="required">*</span></label>
+                <label>Select Action <span class="required">*</span></label>
                 <div id="actionOptions">
                     <div class="action-card" data-action="stop-work" onclick="selectAction(this)">
                         <div class="icon">⚠️</div>
@@ -193,6 +254,7 @@
                 </div>
             </div>
 
+            <!-- AI Analysis -->
             <div class="ai-response" style="margin-top:1.5rem;">
                 <h4>⚡ A.C.E. AI Analysis</h4>
                 <div class="observation" id="aiContra1">🔍 Analyzing violation severity...</div>
@@ -208,6 +270,7 @@
                 </div>
                 <div class="body" id="noticeBody">
                     <p><strong>To:</strong> <span id="noticeTo">-</span></p>
+                    <p><strong>Permit No:</strong> <span id="noticePermit">-</span></p>
                     <p><strong>Subject:</strong> <span id="noticeSubject">-</span></p>
                     <p style="margin-top:0.8rem;" id="noticeDetails">-</p>
                     <p style="margin-top:0.8rem;" id="noticeAction">-</p>
@@ -280,6 +343,7 @@
                 el.classList.add('severity-' + severity);
             }
             updateNotice();
+            updateAI();
         }
 
         // Update AI recommendations
@@ -323,7 +387,11 @@
         // Update notice preview
         function updateNotice() {
             const project = document.getElementById('contraProject').value || '[Project Name]';
-            const stage = document.getElementById('contraStage').value || '[Stage]';
+            const developer = document.getElementById('contraDeveloper').value || '[Developer]';
+            const permit = document.getElementById('contraPermit').value || '[Permit #]';
+            const address = document.getElementById('contraAddress').value || '[Address]';
+            const stageNum = document.getElementById('contraStageNumber').value || '[Stage]';
+            const stageType = document.getElementById('contraStageType').value || '[Stage Type]';
             const details = document.getElementById('contraDetails').value || '[Details pending]';
             const severity = document.getElementById('contraSeverity').value || 'Unassigned';
             const now = new Date();
@@ -339,8 +407,9 @@
 
             document.getElementById('noticeTitle').textContent = actionData.title;
             document.getElementById('noticeDate').textContent = dateStr;
-            document.getElementById('noticeTo').textContent = `Owner/Developer of ${project}`;
-            document.getElementById('noticeSubject').textContent = `${actionData.subject} - ${stage}`;
+            document.getElementById('noticeTo').textContent = `${developer} (${project})`;
+            document.getElementById('noticePermit').textContent = permit;
+            document.getElementById('noticeSubject').textContent = `${actionData.subject} - ${stageNum} (${stageType})`;
             document.getElementById('noticeDetails').textContent = `Violation: ${details}`;
             document.getElementById('noticeAction').textContent = `Action Required: ${actionData.action}`;
             document.getElementById('noticeFooterDate').textContent = dateStr;
@@ -353,10 +422,19 @@
             e.preventDefault();
 
             // Validate
-            if (!document.getElementById('contraProject').value.trim() ||
-                !document.getElementById('contraStage').value ||
-                !document.getElementById('contraSeverity').value ||
-                !document.getElementById('contraDetails').value.trim()) {
+            const required = ['contraProject', 'contraDeveloper', 'contraPermit', 'contraAddress', 'contraStageNumber', 'contraStageType', 'contraTeam', 'contraSeverity', 'contraDetails'];
+            let valid = true;
+            required.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el.value.trim()) {
+                    el.style.borderColor = '#ff6b6b';
+                    valid = false;
+                } else {
+                    el.style.borderColor = '';
+                }
+            });
+
+            if (!valid) {
                 showToast('⚠️ Please fill in all required fields');
                 return;
             }
@@ -374,7 +452,7 @@
             showToast('⏳ Submitting contravention report...');
 
             setTimeout(() => {
-                showToast('✅ Contravention submitted! Notices generated and saved.');
+                showToast('✅ Contravention submitted! Notices generated.');
                 // Reset form
                 this.reset();
                 document.getElementById('contraPhotoPreview').innerHTML = '';
@@ -392,7 +470,12 @@
         // Auto-update AI on input
         document.getElementById('contraDetails').addEventListener('input', updateAI);
         document.getElementById('contraProject').addEventListener('input', updateNotice);
-        document.getElementById('contraStage').addEventListener('change', updateNotice);
+        document.getElementById('contraDeveloper').addEventListener('input', updateNotice);
+        document.getElementById('contraPermit').addEventListener('input', updateNotice);
+        document.getElementById('contraAddress').addEventListener('input', updateNotice);
+        document.getElementById('contraStageNumber').addEventListener('input', updateNotice);
+        document.getElementById('contraStageType').addEventListener('change', updateNotice);
+        document.getElementById('contraTeam').addEventListener('change', updateNotice);
 
         // Toast function
         function showToast(message) {
@@ -408,4 +491,4 @@
         window.showToast = showToast;
     </script>
 </body>
-                              </html>
+    </html>
