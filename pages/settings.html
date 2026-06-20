@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Settings - A.C.E.</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+</head>
+<body>
+    <div class="top-bar" style="position:fixed;top:0;left:0;right:0;z-index:50;">
+        <div class="logo">
+            <span style="font-size:1.6rem;">⚡</span>
+            A.C.E.
+            <small>Settings</small>
+        </div>
+        <div class="top-actions">
+            <span class="badge"><i class="fas fa-circle" style="color:#4caf50;font-size:0.5rem;"></i> EPPPS live</span>
+            <div class="user">
+                <i class="fas fa-user-cog"></i>
+                <span style="font-size:0.8rem;font-weight:500;">Team A</span>
+            </div>
+        </div>
+    </div>
+
+    <div style="padding:90px 20px 30px;max-width:800px;margin:0 auto;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+            <h1 style="font-size:1.8rem;font-weight:800;"><i class="fas fa-cog" style="color:#00d4ff;"></i> Settings</h1>
+            <button onclick="window.location.href='dashboard.html'" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);padding:0.6rem 1.2rem;border-radius:40px;color:#eef2f8;cursor:pointer;font-family:'Inter',sans-serif;">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;">
+            <h3>💾 Data Management</h3>
+            <p style="color:#889bc2;font-size:0.9rem;margin:0.5rem 0 1.5rem;">
+                All your data is stored locally on this device. Use these options to backup or restore your data.
+            </p>
+
+            <div style="display:flex;flex-direction:column;gap:0.8rem;">
+                <button onclick="backupData()" style="background:rgba(0,212,255,0.05);border:1px solid rgba(0,212,255,0.1);padding:0.8rem 1.5rem;border-radius:12px;color:#eef2f8;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:1rem;">
+                    <i class="fas fa-download" style="color:#00d4ff;font-size:1.2rem;"></i>
+                    <div style="text-align:left;">
+                        <div style="font-weight:600;">Export Backup</div>
+                        <div style="font-size:0.75rem;color:#5a6f92;">Download all data as JSON file</div>
+                    </div>
+                </button>
+
+                <button onclick="restoreData()" style="background:rgba(255,193,7,0.05);border:1px solid rgba(255,193,7,0.1);padding:0.8rem 1.5rem;border-radius:12px;color:#eef2f8;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:1rem;">
+                    <i class="fas fa-upload" style="color:#ffc107;font-size:1.2rem;"></i>
+                    <div style="text-align:left;">
+                        <div style="font-weight:600;">Restore from Backup</div>
+                        <div style="font-size:0.75rem;color:#5a6f92;">Upload a JSON backup file</div>
+                    </div>
+                </button>
+
+                <button onclick="clearData()" style="background:rgba(255,107,107,0.05);border:1px solid rgba(255,107,107,0.1);padding:0.8rem 1.5rem;border-radius:12px;color:#eef2f8;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:1rem;">
+                    <i class="fas fa-trash" style="color:#ff6b6b;font-size:1.2rem;"></i>
+                    <div style="text-align:left;">
+                        <div style="font-weight:600;">Clear All Data</div>
+                        <div style="font-size:0.75rem;color:#5a6f92;">⚠️ This cannot be undone</div>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:1.5rem;">
+            <h3>📊 Data Statistics</h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem;" id="statsGrid">
+                <div style="text-align:center;padding:0.5rem;background:rgba(255,255,255,0.02);border-radius:8px;">
+                    <div style="font-size:0.7rem;color:#5a6f92;">Projects</div>
+                    <div style="font-size:1.5rem;font-weight:700;color:#00d4ff;" id="statProjects">0</div>
+                </div>
+                <div style="text-align:center;padding:0.5rem;background:rgba(255,255,255,0.02);border-radius:8px;">
+                    <div style="font-size:0.7rem;color:#5a6f92;">Stage Reports</div>
+                    <div style="font-size:1.5rem;font-weight:700;color:#00d4ff;" id="statReports">0</div>
+                </div>
+                <div style="text-align:center;padding:0.5rem;background:rgba(255,255,255,0.02);border-radius:8px;">
+                    <div style="font-size:0.7rem;color:#5a6f92;">Contraventions</div>
+                    <div style="font-size:1.5rem;font-weight:700;color:#ff6b6b;" id="statContraventions">0</div>
+                </div>
+                <div style="text-align:center;padding:0.5rem;background:rgba(255,255,255,0.02);border-radius:8px;">
+                    <div style="font-size:0.7rem;color:#5a6f92;">PCA Audits</div>
+                    <div style="font-size:1.5rem;font-weight:700;color:#4caf50;" id="statPCA">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../storage.js"></script>
+    <script>
+        // Update stats
+        function updateStats() {
+            document.getElementById('statProjects').textContent = getProjects().length;
+            document.getElementById('statReports').textContent = getReports().length;
+            document.getElementById('statContraventions').textContent = getContraventions().length;
+            document.getElementById('statPCA').textContent = getPCA().length;
+        }
+
+        function backupData() {
+            const data = exportAllData();
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ace-backup-${formatDate(new Date())}.json`;
+            a.click();
+            showToast('✅ Data backed up successfully!');
+        }
+
+        function restoreData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        importAllData(data);
+                        updateStats();
+                        showToast('✅ Data restored successfully!');
+                    } catch (err) {
+                        showToast('⚠️ Invalid backup file');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function clearData() {
+            if (confirm('⚠️ Are you sure you want to delete ALL data? This cannot be undone!')) {
+                clearAllData();
+                updateStats();
+                showToast('🗑️ All data cleared');
+            }
+        }
+
+        function showToast(message) {
+            let toast = document.getElementById('toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toast';
+                toast.className = 'toast';
+                document.body.appendChild(toast);
+            }
+            toast.textContent = message;
+            toast.classList.add('show');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        updateStats();
+    </script>
+</body>
+</html>
