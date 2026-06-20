@@ -19,37 +19,46 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
     
     <style>
-        /* LASBCA Badge Style */
+        /* LASBCA Professional Badge */
         .lasbca-badge {
             background: #00d4ff;
             color: #0b0f1a;
-            padding: 3px 14px;
-            border-radius: 4px;
-            font-weight: 800;
-            font-size: 0.7rem;
+            padding: 4px 16px;
+            border-radius: 6px;
+            font-weight: 900;
+            font-size: 0.75rem;
             letter-spacing: 1.5px;
             display: inline-block;
             text-transform: uppercase;
+            box-shadow: 0 2px 8px rgba(0, 212, 255, 0.3);
         }
         .splash-logo {
             background: rgba(0, 212, 255, 0.08);
-            border: 1px solid rgba(0, 212, 255, 0.2);
-            border-radius: 12px;
-            padding: 0.5rem 1.5rem;
+            border: 2px solid rgba(0, 212, 255, 0.15);
+            border-radius: 16px;
+            padding: 0.8rem 2rem;
             display: inline-block;
             margin-bottom: 0.8rem;
         }
-        .splash-logo img {
-            height: 50px;
-            width: auto;
-            display: block;
-        }
-        .splash-logo-text {
-            font-size: 0.65rem;
-            color: #00d4ff;
+        .splash-logo .badge {
+            background: #00d4ff;
+            color: #0b0f1a;
+            padding: 4px 20px;
+            border-radius: 6px;
+            font-weight: 900;
+            font-size: 1.2rem;
             letter-spacing: 3px;
+            display: block;
             text-transform: uppercase;
-            margin-top: 0.2rem;
+        }
+        .splash-logo .sub {
+            font-size: 0.6rem;
+            color: #00d4ff;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 4px;
+            display: block;
+            opacity: 0.8;
         }
     </style>
 </head>
@@ -59,10 +68,10 @@
     <div id="splash-overlay">
         <div class="splash-card">
             <div class="splash-icon">
-                <!-- LASBCA Logo -->
+                <!-- LASBCA Professional Logo -->
                 <div class="splash-logo">
-                    <span style="font-size:2.5rem;">🏛️</span>
-                    <div class="splash-logo-text">Lagos State Building Control Agency</div>
+                    <span class="badge">LASBCA</span>
+                    <span class="sub">Lagos State Building Control Agency</span>
                 </div>
                 <span style="font-size:4rem; display:block; margin-top:0.3rem;">⚡</span>
             </div>
@@ -102,7 +111,7 @@
         <!-- top bar with LASBCA Badge -->
         <div class="top-bar">
             <div class="logo" style="display:flex; align-items:center; gap:10px;">
-                <span class="lasbca-badge">🏛️ LASBCA</span>
+                <span class="lasbca-badge">LASBCA</span>
                 <span style="font-size:1.6rem;">⚡</span>
                 <span style="font-weight:800; font-size:1.4rem;">A.C.E.</span>
                 <small style="font-weight:400; font-size:0.65rem; color:#a0b3d9; letter-spacing:1px;">Automated Compliance Engine</small>
@@ -192,4 +201,4 @@
         });
     </script>
 </body>
-        </html>
+</html>
