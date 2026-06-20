@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>A.C.E. – Automated Compliance Engine</title>
     
-    <!-- ===== PWA META TAGS (NEW) ===== -->
+    <!-- ===== PWA META TAGS ===== -->
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#00d4ff" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -16,8 +16,42 @@
     <link rel="stylesheet" href="styles.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-    <!-- Favicon emoji -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+    
+    <style>
+        /* LASBCA Badge Style */
+        .lasbca-badge {
+            background: #00d4ff;
+            color: #0b0f1a;
+            padding: 3px 14px;
+            border-radius: 4px;
+            font-weight: 800;
+            font-size: 0.7rem;
+            letter-spacing: 1.5px;
+            display: inline-block;
+            text-transform: uppercase;
+        }
+        .splash-logo {
+            background: rgba(0, 212, 255, 0.08);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 12px;
+            padding: 0.5rem 1.5rem;
+            display: inline-block;
+            margin-bottom: 0.8rem;
+        }
+        .splash-logo img {
+            height: 50px;
+            width: auto;
+            display: block;
+        }
+        .splash-logo-text {
+            font-size: 0.65rem;
+            color: #00d4ff;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-top: 0.2rem;
+        }
+    </style>
 </head>
 <body>
 
@@ -25,7 +59,12 @@
     <div id="splash-overlay">
         <div class="splash-card">
             <div class="splash-icon">
-                <span style="font-size:4rem;">⚡</span>
+                <!-- LASBCA Logo -->
+                <div class="splash-logo">
+                    <span style="font-size:2.5rem;">🏛️</span>
+                    <div class="splash-logo-text">Lagos State Building Control Agency</div>
+                </div>
+                <span style="font-size:4rem; display:block; margin-top:0.3rem;">⚡</span>
             </div>
             <h1>A.C.E.</h1>
             <div class="sub">Automated Compliance Engine</div>
@@ -60,12 +99,13 @@
 
     <!-- ===== MAIN UI ===== -->
     <div id="main-ui">
-        <!-- top bar -->
+        <!-- top bar with LASBCA Badge -->
         <div class="top-bar">
-            <div class="logo">
+            <div class="logo" style="display:flex; align-items:center; gap:10px;">
+                <span class="lasbca-badge">🏛️ LASBCA</span>
                 <span style="font-size:1.6rem;">⚡</span>
-                A.C.E.
-                <small>Automated Compliance Engine</small>
+                <span style="font-weight:800; font-size:1.4rem;">A.C.E.</span>
+                <small style="font-weight:400; font-size:0.65rem; color:#a0b3d9; letter-spacing:1px;">Automated Compliance Engine</small>
             </div>
             <div class="top-actions">
                 <span class="badge"><i class="fas fa-circle" style="color:#4caf50;font-size:0.5rem;"></i> EPPPS live</span>
@@ -111,7 +151,7 @@
 
     <script type="module" src="script.js"></script>
     
-    <!-- ===== SERVICE WORKER REGISTRATION (NEW) ===== -->
+    <!-- ===== SERVICE WORKER REGISTRATION ===== -->
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/ace-saas/sw.js')
@@ -122,6 +162,34 @@
                     console.log('❌ Service Worker registration failed:', error);
                 });
         }
+
+        window.navigateTo = function(page) {
+            window.location.href = 'pages/' + page + '.html';
+        };
+
+        window.syncGoogleSheet = function() {
+            showToast('🔄 Google Sheets sync coming soon!');
+        };
+
+        function showToast(message) {
+            let toast = document.getElementById('toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toast';
+                toast.className = 'toast';
+                document.body.appendChild(toast);
+            }
+            toast.textContent = message;
+            toast.classList.add('show');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        document.getElementById('enterBtn').addEventListener('click', function() {
+            document.getElementById('splash-overlay').classList.add('hidden');
+        });
     </script>
 </body>
-</html>
+        </html>
