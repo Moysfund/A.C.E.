@@ -77,12 +77,43 @@
             border-radius: 8px;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
+        .form-section-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #00d4ff;
+            margin: 1.5rem 0 1rem;
+            padding-bottom: 0.3rem;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+        }
+        .form-section-title i {
+            margin-right: 8px;
+        }
+        .signature-line {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 0.3rem;
+            margin-top: 0.3rem;
+            min-height: 30px;
+        }
+        .signature-line input {
+            background: transparent;
+            border: none;
+            width: 100%;
+            color: #eef2f8;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            padding: 0.2rem 0;
+        }
+        .signature-line input:focus {
+            outline: none;
+            border-bottom: 1px solid #00d4ff;
+        }
     </style>
 </head>
 <body>
     <!-- Top Navigation -->
     <div class="top-bar" style="position:fixed;top:0;left:0;right:0;z-index:50;">
-        <div class="logo">
+        <div class="logo" style="display:flex; align-items:center; gap:10px;">
+            <span class="lasbca-badge">🏛️ LASBCA</span>
             <span style="font-size:1.6rem;">⚡</span>
             A.C.E.
             <small>PCA Audit</small>
@@ -106,20 +137,72 @@
         </div>
 
         <form id="pcaForm">
+            <!-- Report Information -->
+            <div class="form-section-title"><i class="fas fa-file-alt"></i> Report Information</div>
+            
+            <div class="form-group">
+                <label>File No. <span class="required">*</span></label>
+                <input type="text" id="pcaFileNo" placeholder="e.g., PCA-2026-045" required />
+            </div>
+
+            <!-- Project Information -->
+            <div class="form-section-title"><i class="fas fa-building"></i> Project Information</div>
+            
             <div class="form-group">
                 <label>Project Name <span class="required">*</span></label>
                 <input type="text" id="pcaProject" placeholder="e.g., Eko Tower Phase 2 (Completed)" required />
             </div>
+            
+            <div class="form-group">
+                <label>Developer Name <span class="required">*</span></label>
+                <input type="text" id="pcaDeveloper" placeholder="e.g., Eko Development Ltd" required />
+            </div>
+            
+            <div class="form-group">
+                <label>Permit Number <span class="required">*</span></label>
+                <input type="text" id="pcaPermit" placeholder="e.g., LASBCA-2026-045" required />
+            </div>
+            
+            <div class="form-group">
+                <label>Site Address <span class="required">*</span></label>
+                <input type="text" id="pcaAddress" placeholder="e.g., 12 Allen Avenue, Ikeja, Lagos" required />
+            </div>
+
+            <!-- Audit Information -->
+            <div class="form-section-title"><i class="fas fa-clipboard-list"></i> Audit Information</div>
+            
             <div class="form-row">
                 <div class="form-group">
                     <label>Audit Date <span class="required">*</span></label>
                     <input type="date" id="pcaDate" required />
                 </div>
                 <div class="form-group">
+                    <label>Report Date <span class="required">*</span></label>
+                    <input type="date" id="pcaReportDate" required />
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
                     <label>Auditor Name <span class="required">*</span></label>
                     <input type="text" id="pcaAuditor" placeholder="e.g., Engr. Adebayo" required />
                 </div>
+                <div class="form-group">
+                    <label>Team Head <span class="required">*</span></label>
+                    <input type="text" id="pcaTeamHead" placeholder="e.g., Engr. Adebayo" required />
+                </div>
             </div>
+
+            <!-- Signature -->
+            <div class="form-section-title"><i class="fas fa-pen"></i> Signature</div>
+            
+            <div class="form-group">
+                <label>Team Head Signature</label>
+                <div class="signature-line">
+                    <input type="text" id="pcaSignature" placeholder="Type your full name as signature..." />
+                </div>
+            </div>
+
             <div class="form-group">
                 <label>Upload As-Built Photos</label>
                 <div class="file-upload" onclick="document.getElementById('pcaPhotoInput').click()">
@@ -226,7 +309,15 @@
         let pcaPhotos = [];
         let selectedRecommendation = 'pass';
 
-        // Handle photos
+        // Set default dates
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('pcaDate').value = today;
+            document.getElementById('pcaReportDate').value = today;
+            document.getElementById('complianceFill').style.width = '92%';
+            document.getElementById('complianceFill').className = 'meter-fill pass';
+        });
+
         function handlePcaPhotos(event) {
             const files = event.target.files;
             for (let file of files) {
@@ -258,7 +349,6 @@
             renderPcaPhotos();
         }
 
-        // Select recommendation
         function selectRecommendation(el) {
             document.querySelectorAll('#recommendationGroup button').forEach(b => b.classList.remove('active'));
             el.classList.add('active');
@@ -286,18 +376,35 @@
         document.getElementById('pcaForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
-            if (!document.getElementById('pcaProject').value.trim() ||
-                !document.getElementById('pcaDate').value ||
-                !document.getElementById('pcaAuditor').value.trim()) {
+            const required = ['pcaFileNo', 'pcaProject', 'pcaDeveloper', 'pcaPermit', 'pcaAddress', 'pcaDate', 'pcaReportDate', 'pcaAuditor', 'pcaTeamHead'];
+            let valid = true;
+            required.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el.value.trim()) {
+                    el.style.borderColor = '#ff6b6b';
+                    valid = false;
+                } else {
+                    el.style.borderColor = '';
+                }
+            });
+
+            if (!valid) {
                 showToast('⚠️ Please fill in all required fields');
                 return;
             }
 
             const data = {
-                id: 'PCA-' + Date.now().toString().slice(-6),
+                id: document.getElementById('pcaFileNo').value || 'PCA-' + Date.now().toString().slice(-6),
+                fileNo: document.getElementById('pcaFileNo').value,
                 project: document.getElementById('pcaProject').value,
+                developer: document.getElementById('pcaDeveloper').value,
+                permit: document.getElementById('pcaPermit').value,
+                address: document.getElementById('pcaAddress').value,
                 auditor: document.getElementById('pcaAuditor').value,
+                teamHead: document.getElementById('pcaTeamHead').value,
                 date: document.getElementById('pcaDate').value,
+                reportDate: document.getElementById('pcaReportDate').value,
+                signature: document.getElementById('pcaSignature').value || 'Signed',
                 status: selectedRecommendation || 'pass',
                 score: parseInt(document.getElementById('complianceScore').textContent) || 92,
                 notes: document.getElementById('pcaNotes').value || 'Audit completed successfully.',
@@ -324,15 +431,6 @@
             });
         });
 
-        // Set default date
-        document.addEventListener('DOMContentLoaded', function() {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('pcaDate').value = today;
-            document.getElementById('complianceFill').style.width = '92%';
-            document.getElementById('complianceFill').className = 'meter-fill pass';
-        });
-
-        // Toast function
         function showToast(message) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
